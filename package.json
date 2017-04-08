@@ -1,0 +1,41 @@
+{
+  "name": "echoppe",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "./node_modules/mocha/bin/_mocha"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": " ~2.4.3",
+    "body-parser": "~1.16.0",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.0",
+    "dotenv": " ~4.0.0",
+    "ejs": " ~2.5.6",
+    "express": " ~4.15.2",
+    "express-session": " ~1.15.1",
+    "morgan": "~1.7.0",
+    "node-dir": " ~0.1.16",
+    "passport": " ~0.3.2",
+    "passport-local": " ~1.0.0",
+    "pg": " ~6.1.5",
+    "pg-hstore": " ~2.3.2",
+    "sails-memory": " ~0.10.7",
+    "sails-postgresql": " ~0.11.4",
+    "sequelize": " ~3.30.4",
+    "serve-favicon": "~2.3.2",
+    "uuid": " ~3.0.1",
+    "waterline": " ~0.11.11"
+  },
+  "devDependencies": {
+    "chai": " ~3.5.0",
+    "chai-http": " ~3.0.0",
+    "mocha": " ~3.2.0",
+    "passport-stub": " ~1.1.1"
+  }
+}
