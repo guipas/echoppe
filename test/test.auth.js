@@ -4,9 +4,11 @@ const chai = require(`chai`);
 const should = chai.should();
 const chaiHttp = require(`chai-http`);
 const passportStub = require(`passport-stub`);
-const db = require(`../db`);
+const db = require(`../db/db`);
 const memoryAdapter = require(`sails-memory`);
 const fixtures = require(`./fixtures.auth.js`);
+const config = require('../config.js');
+config.csrf = false;
 const server = require(`../app`);
 
 chai.use(chaiHttp);
@@ -18,9 +20,6 @@ const tests = {};
 describe(`routes : auth`, () => {
 
   before(() => {
-    // return knex.migrate.rollback()
-    // .then(() => { return knex.migrate.latest(); })
-    // .then(() => { return knex.seed.run(); });
     return db.init({
       adapters : {
         default : memoryAdapter,
@@ -68,6 +67,7 @@ describe(`routes : auth`, () => {
     it(`should register a new user`, (done) => {
       chai.request(server)
       .post(`/auth/register`)
+      .set(`accept`, `application/json`)
       .send({
         email: `test@guipss.com`,
         password: `testtest`

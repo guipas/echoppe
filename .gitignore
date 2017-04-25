@@ -33,3 +33,6 @@ npm-debug.log
 *.env
 .vscode
 /config.js
+
+/admin.old
+/todo.md

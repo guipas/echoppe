@@ -1,0 +1,17 @@
+<%- include(`../partials/header`) %>
+          <%- config.site.url %>
+<div class="product-list">
+  <% products.forEach( product => { %>
+    <div class="product">
+      <div class="product-inner">
+        <div class="product-name">
+            <%- product.name %>
+        </div>
+        <div class="product-tools">
+          <a href="">Modifier</a>
+        </div>
+      </div>
+    </div>
+  <% }) %><!-- end product.forEach -->
+</div>
+<%- include(`../partials/footer`) %>

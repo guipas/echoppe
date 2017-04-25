@@ -1,0 +1,18 @@
+<%- include(`../partials/header`) %>
+<form method="POST" enctype="multipart/form-data" action="?_csrf=<%= csrf %>">
+  <input type="hidden" value="<%= csrf %>" name="_csrf">
+  <div class="input-container">
+    <input type="text" name="name" placeholder="Product name">
+  </div>
+  <div class="input-container">
+    <input type="text" name="price" placeholder="Price">
+  </div>
+  <div class="input-container">
+    <textarea name="description" id="" cols="30" rows="10" placeholder="description"></textarea>
+  </div>
+  <input type="file" name="images" multiple> 
+  <div class="input-container">
+    <input type="submit" value="save product">
+  </div>
+</form> 
+<%- include(`../partials/footer`) %>

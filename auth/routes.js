@@ -2,7 +2,7 @@
 
 const express = require(`express`);
 const router = express.Router();
-const db = require(`../db`);
+const db = require(`../db/db`);
 const passport = require('passport');
 const helpers = require('./helpers.js');
 
@@ -10,20 +10,33 @@ const handleResponse = (res, code, statusMsg) => {
   res.status(code).json({ status: statusMsg });
 }
 
+router.get(`/register`, (req, res, next) => {
+  res.render(`register`, { _csrf : req.csrfToken() });
+});
+
+router.get(`/login`, (req, res, next) => {
+  res.render(`login`, { _csrf : req.csrfToken() });
+});
+
 router.post(`/register`, helpers.loginRedirect, (req, res, next) =>
   helpers.validateCredentials(req)
-  .then(() => db.models.user.create({
+  // .then(() => db.models.user.create({
+  //   email : req.body.email,
+  //   password : req.body.password,
+  // }))
+  .then(() => db.models.user.make({
     email : req.body.email,
     password : req.body.password,
   }))
   .then(user => {
-    user.username = user.email;
     passport.authenticate('local', (err, user, info) => {
       if (err) {
         console.log(err);
         throw new Error(err);
       }
-      if (user) {  handleResponse(res, 200, 'success'); }
+      if (user) {
+        handleResponse(res, 200, 'success');
+      }
       else  handleResponse(res, 500, 'error');
     })(req, res, next);
     return null;
