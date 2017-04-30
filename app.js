@@ -16,8 +16,7 @@ const wantsJson = require(`./lib/wantsJson`);
 const SequelizeSessionStore = require(`connect-session-sequelize`)(session.Store);
 const sequelize = require(`./db/sequelize`);
 const pluginManager = require(`./lib/plugins`);
-
-pluginManager.loadPlugins();
+const db = require(`./db/db`);
 
 const sequelizeSessionStore = new SequelizeSessionStore({
   db: sequelize
@@ -91,5 +90,13 @@ app.use((err, req, res, next) => {
   // res.render('error');
   res.send(`error`);
 });
+
+app.init = () => {
+  // return db.sequelize.sync({ force : true })
+  return db.sequelize.sync()
+  .then(() => {
+    pluginManager.init();
+  })
+}
 
 module.exports = app;

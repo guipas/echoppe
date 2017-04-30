@@ -5,9 +5,13 @@ const sequelize = require(`../sequelize`);
 const productModel = require(`./product.model`);
 const priceModel = require(`./price.model`);
 const cartProductModel = require(`./cart_product.model`);
+const stepFulfillmentModel = require(`./step_fulfillment.model`);
+const stepModel = require(`./step.model`);
 
 const CART_NEW = 0;
-const CART_ORDERED = 1;
+const CART_PROCESSING = 5;// all steps fulfilled
+const CART_ORDERED = 10;// order accepted (payment validated...)
+const CART_COMPLETED = 15;// product sent
 
 
 const cartModel = sequelize.define(`cart`, {
@@ -20,7 +24,7 @@ const cartModel = sequelize.define(`cart`, {
 
     status : {
       type: Sequelize.INTEGER,
-      defaultValue : 0,
+      defaultValue : CART_NEW,
     }
 
   }, {
@@ -34,6 +38,7 @@ const cartModel = sequelize.define(`cart`, {
           where : { uid },
           include: [
               { model: productModel, as: `products`, through : cartProductModel, include : [{ model : priceModel, as : `prices` }] },
+              { model: stepFulfillmentModel, as: `stepFulfillments`, include : [{ model : stepModel, as: `step` }] },
             ],
         })
         .then(cart => cart.get({ plain : true }))
@@ -72,7 +77,7 @@ const cartModel = sequelize.define(`cart`, {
         .then(cart => {
           if (!cart) {
             console.log(`no cart, creating...`);
-            return this.create().then(cart => cart.addProduct(product)).then(() => cart);
+            return this.create().then(cart => cart.addProduct(product).then(() => cart));
           }
           console.log(`existing cart, adding to cart`);
           // return cart.addProduct(product)

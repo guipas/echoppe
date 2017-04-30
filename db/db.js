@@ -24,10 +24,20 @@ const productModel = require(`./models/product.model`);
 const priceModel = require(`./models/price.model`);
 const uploadModel = require(`./models/upload.model`);
 const cartModel = require(`./models/cart.model`);
+const optionModel = require(`./models/option.model`);
+const stepModel = require(`./models/step.model`);
 
 require(`./relations`);
 
 module.exports = {
   sequelize,
-  models : { product : productModel, upload : uploadModel, user : userModel, price : priceModel, cart : cartModel },
+  models : {
+    product : productModel,
+    upload : uploadModel,
+    user : userModel,
+    price : priceModel,
+    cart : cartModel,
+    option : optionModel,
+    step : stepModel,
+  },
 };

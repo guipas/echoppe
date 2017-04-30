@@ -1,0 +1,25 @@
+<%- include(`../partials/header`) %>
+<div class="steps-list">
+  <% steps.forEach( step => { %>
+    <div class="step">
+      <div class="step-inner">
+        <div class="step-name">
+            <%- step.name %>
+        </div>
+        <div class="step-activated">
+            <%- step.activated %>
+        </div>
+        <div class="step-tools">
+          <div class="step-tool step-tool-activate">
+            <form method="POST" action="/admin/steps/<%- step.name %>">
+              <input type="hidden" value="<%= csrf %>" name="_csrf">
+              <input type="submit" value="activate">
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  <% }) %><!-- end media.forEach -->
+</div>
+<%- include(`../partials/footer`) %>

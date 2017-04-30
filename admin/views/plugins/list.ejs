@@ -1,0 +1,31 @@
+<%- include(`../partials/header`) %>
+<div class="plugins-list">
+  <% plugins.forEach( plugin => { %>
+    <div class="plugin">
+      <div class="plugin-inner">
+        <div class="plugin-name">
+            <%- plugin.name %>
+        </div>
+        <div class="plugin-title">
+            <%- plugin.title %>
+        </div>
+        <div class="plugin-description">
+            <%- plugin.description %>
+        </div>
+        <div class="plugin-active">
+            <%- plugin.isActive %>
+        </div>
+        <div class="plugin-tools">
+          <div class="plugin-tool plugin-tool-activate">
+            <form method="POST" action="/admin/plugins/<%- plugin.name %>">
+              <input type="hidden" value="<%= csrf %>" name="_csrf">
+              <input type="submit" value="activate">
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  <% }) %><!-- end media.forEach -->
+</div>
+<%- include(`../partials/footer`) %>

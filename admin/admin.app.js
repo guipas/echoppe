@@ -10,6 +10,7 @@ const productHandlers = require(`./handlers/product.handlers`);
 const productsHandlers = require(`./handlers/products.handlers`);
 const mediaHandlers = require(`./handlers/media.handlers`);
 const pluginsHandlers = require(`./handlers/plugins.handlers`);
+const stepsHandlers = require(`./handlers/steps.handlers`);
 
 
 admin.locals.config = require(`../config`);
@@ -33,6 +34,10 @@ admin.post(`/product/create`, upload.array(`images`), productHandlers.create);
 
 admin.get(`/images`, mediaHandlers.list);
 
-admin.get(`/plugins`, pluginsHandlers.list):
+admin.get(`/plugins`, pluginsHandlers.list);
+admin.post(`/plugins/:plugin`, pluginsHandlers.triggerActivation);
+
+admin.get(`/steps`, stepsHandlers.list);
+admin.post(`/steps/:step`, stepsHandlers.triggerActivation);
 
 module.exports = admin;

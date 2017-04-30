@@ -3,6 +3,10 @@
 const Sequelize = require(`sequelize`);
 const sequelize = require(`../sequelize`);
 
+const STEP_CHOSEN = 1;
+const STEP_PROCESSING = 5;
+const STEP_COMPLETED = 10;
+
 
 const stepFulfillment = sequelize.define(`step_fulfillment`, {
 
@@ -10,6 +14,11 @@ const stepFulfillment = sequelize.define(`step_fulfillment`, {
       type: Sequelize.UUID,
       primaryKey: true,
       defaultValue: Sequelize.UUIDV4,
+    },
+
+    status : {
+      type : Sequelize.INTEGER,
+      defaultValue: STEP_CHOSEN,
     },
 
     infos : {
