@@ -30,7 +30,7 @@ module.exports = {
           "allowSingleLine": true,
         }],
         "callback-return": "error",
-        "camelcase": "error",
+        "camelcase": "off",
         // "comma-dangle": [
         //     "error",
         //     "only-multiline"

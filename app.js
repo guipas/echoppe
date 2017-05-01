@@ -15,8 +15,10 @@ const csrf = require('csurf');
 const wantsJson = require(`./lib/wantsJson`);
 const SequelizeSessionStore = require(`connect-session-sequelize`)(session.Store);
 const sequelize = require(`./db/sequelize`);
-const pluginManager = require(`./lib/plugins`);
 const db = require(`./db/db`);
+const pluginManager = require(`./lib/plugins`);
+const cartMiddleware = require(`./lib/cart.middleware`);
+const echoppeMiddleware = require(`./lib/echoppe.middleware`);
 
 const sequelizeSessionStore = new SequelizeSessionStore({
   db: sequelize
@@ -64,6 +66,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 initLocalPassport();
 
+app.use(cartMiddleware);
+app.use(echoppeMiddleware);
 
 app.use(`/admin`, require(`./admin/admin.app`));
 app.use(`/auth`, require(`./auth/routes`));
@@ -95,7 +99,7 @@ app.init = () => {
   // return db.sequelize.sync({ force : true })
   return db.sequelize.sync()
   .then(() => {
-    pluginManager.init();
+    pluginManager.init(db);
   })
 }
 

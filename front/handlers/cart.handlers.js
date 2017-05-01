@@ -26,6 +26,7 @@ const handlers = {
     return db.models.cart.putProduct(req.session.cartUid, req.params.product)
     .then(cart => {
       console.log(`cart created or retrieved !`);
+      console.log(cart);
       if (!req.session.cartUid) { req.session.cartUid = cart.uid }
 
       if (req.wantsJson) { res.json(cart); }
