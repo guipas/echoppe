@@ -1,18 +1,45 @@
 <%- include(`../partials/header`) %>
+<div class="form-group">
+  <h2>Create/edit product</h2>
+</div>
 <form method="POST" enctype="multipart/form-data" action="?_csrf=<%= csrf %>">
   <input type="hidden" value="<%= csrf %>" name="_csrf">
-  <div class="input-container">
-    <input type="text" name="name" placeholder="Product name">
-  </div>
-  <div class="input-container">
-    <input type="text" name="price" placeholder="Price">
-  </div>
-  <div class="input-container">
-    <textarea name="description" id="" cols="30" rows="10" placeholder="description"></textarea>
-  </div>
-  <input type="file" name="images" multiple> 
-  <div class="input-container">
-    <input type="submit" value="save product">
+  <input type="hidden" value="<%= product ? product.uid : '' %>" name="uid">
+  <fieldset>
+    <div class="form-group">
+        <label for="name">Product name</label>
+        <input class="form-control" type="text" name="name" placeholder="Product name" value="<%= product ? product.name : '' %>">
+    </div>
+    <div class="form-group">
+        <label for="price">Price</label>
+        <input class="form-control" type="text" name="price" placeholder="Price" value="<%= product ? product.price.value : '' %>">
+    </div>
+    <div class="form-group">
+        <label for="description">Description</label>
+        <textarea class="form-control" name="description" id="" cols="30" rows="10" placeholder="Description"><%= product ? product.description : '' %></textarea>
+    </div>
+    <% if (product && product.uploads && product.uploads.length > 0) { %>
+    <div class="form-group">
+      <label>Images</label>
+      <div class="w-100">
+          <% product.uploads.forEach(upload => { %>
+            <img src="<%= linkToFront('image', upload.uid) %>?format=small_square" alt="" class="img-thumbnail">
+            delete : <input type="checkbox" name="uploads[<%= upload.uid %>]">
+            <div class="clearfix"></div>
+          <% }) %>
+      </div>
+    </div>
+    <% } %>
+    <div class="form-group">
+        <label for="images">Add images</label>
+        <input class="form-control-file" type="file" name="images" multiple> 
+    </div>
+    <div class="form-group">
+      <div class="w-100 align-right d-flex justify-content-end">
+        <input type="submit" value="save product" class="btn btn-outline-primary">
+      </div>
+    </div>
+  </fieldset>
   </div>
 </form> 
 <%- include(`../partials/footer`) %>

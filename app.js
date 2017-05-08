@@ -17,7 +17,7 @@ const SequelizeSessionStore = require(`connect-session-sequelize`)(session.Store
 const sequelize = require(`./db/sequelize`);
 const db = require(`./db/db`);
 const pluginManager = require(`./lib/plugins`);
-const cartMiddleware = require(`./lib/cart.middleware`);
+// const cartMiddleware = require(`./lib/cart.middleware`);
 const echoppeMiddleware = require(`./lib/echoppe.middleware`);
 
 const sequelizeSessionStore = new SequelizeSessionStore({
@@ -38,6 +38,7 @@ app.set(`views`, [
 app.set(`view engine`, `ejs`);
 
 app.use(wantsJson);
+app.use(`/public`, express.static(path.join(__dirname, 'public')));
 // app.use(upload);
 // uncomment after placing your favicon in /public
 // app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -66,7 +67,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 initLocalPassport();
 
-app.use(cartMiddleware);
+// app.use(cartMiddleware);
 app.use(echoppeMiddleware);
 
 app.use(`/admin`, require(`./admin/admin.app`));
@@ -82,22 +83,28 @@ app.use((req, res, next) => {
 
 // error handler
 app.use((err, req, res, next) => {
+
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get(`env`) === `development` ? err : {};
 
-
-  console.log(err.message);
+  console.log(err);
 
   // render the error page
   res.status(err.status || 500);
   // res.render('error');
-  res.send(`error`);
+  if (err instanceof Error) {
+    res.send(`error`);
+  } else if (typeof err === `object` && err.message) {
+    res.send(err.message);
+  } else {
+    res.send(`Error`);
+  }
 });
 
 app.init = () => {
-  // return db.sequelize.sync({ force : true })
-  return db.sequelize.sync()
+  return db.sequelize.sync({ force : true })
+  // return db.sequelize.sync()
   .then(() => {
     pluginManager.init(db);
   })

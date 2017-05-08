@@ -1,17 +1,19 @@
 <%- include(`../partials/header`) %>
-          <%- config.site.url %>
-<div class="product-list">
-  <% products.forEach( product => { %>
-    <div class="product">
-      <div class="product-inner">
-        <div class="product-name">
+
+<h2>Products List</h2>
+<div class="product-list list-group">
+  <% products.forEach( (product,i) => { %>
+    <a class="product list-group-item list-group-item-action flex-column align-items-start" href="<%- linkTo('product',product.uid) %>">
+      <div class="product-inner d-flex w-100 justify-content-between">
+        <h5 class="product-name mb-1">
             <%- product.name %>
-        </div>
-        <div class="product-tools">
-          <a href="">Modifier</a>
-        </div>
+        </h5>
+        <% if (product.price) { %> 
+          <small><%= product.price.value %><%= shop.helpers.getCurrencySymbol(product.price.currency) %></small>
+        <% } %>
       </div>
-    </div>
+      <p class="product-description mb-1"><%- product.description %></p>
+    </a>
   <% }) %><!-- end product.forEach -->
 </div>
 <%- include(`../partials/footer`) %>

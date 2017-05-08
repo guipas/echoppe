@@ -8,11 +8,15 @@ const loginRequired = (req, res, next) => {
 }
 
 const adminRequired = (req, res, next) => {
-  if (!req.user) return res.status(401).json({ status: 'Please log in' });
-  // return db.models.user.findOne({ email : req.user.email })
+  if (!req.user) {
+    if (req.wantsJson) {
+      return res.status(401).json({ status: 'Please log in' });
+    }
+    return res.status(401).redirect(`/auth/login`);
+  }
   return db.models.user.fetchByEmail(req.user.email)
   .then(user => {
-    console.log(user);
+    // console.log(user);
     if (!user || user.role !== `admin`) {
       res.status(401).json({ status: 'You are not authorized' });
       return null;

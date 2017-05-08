@@ -5,17 +5,8 @@ const path = require(`path`);
 const sequelize = require(`../sequelize`);
 const uploadModel = require(`./upload.model`);
 const priceModel = require(`./price.model`);
+const uploadProductModel = require(`./upload_product.model`);
 const config = require(`../../config`);
-
-// const setPriceProp = product => {
-//   if (product.prices && product.prices.length) {
-//     const defaultPrice = product.prices.find(p => p.currency === config.defaultCurrency);
-//     if (defaultPrice) product.price = defaultPrice;
-//     else product.price = product.prices[0];
-//   }
-
-//   return product;
-// }
 
 const productModel = sequelize.define(`product`, {
 
@@ -52,16 +43,6 @@ const productModel = sequelize.define(`product`, {
   // root : {
   //   model : `product`,
   //   required : false,
-  // },
-
-  // images : {
-  //   collection : `media`,
-  //   via : `products`,
-  // },
-
-  // price : {
-  //   collection : `price`,
-  //   via  : `product`,
   // },
 
   visible: {
@@ -104,7 +85,7 @@ const productModel = sequelize.define(`product`, {
       return this.create({
         name : product.name,
         description : product.description,
-        prices : [{ value : product.price }],
+        prices : [{ value : product.price ? product.price : 0 }],
         uploads,
       }, {
         include: [
@@ -113,12 +94,75 @@ const productModel = sequelize.define(`product`, {
         ],
       })
     },
-    fetchAll () {
-      return this.findAll({
+    modify (product, files) {
+      return this.findOne({
+        where : { uid : product.uid },
         include: [
           {
             model: uploadModel,
-            through : `upload_product`,
+            through : uploadProductModel,
+            as : `uploads`,
+          },
+          {
+            model: priceModel,
+            as : `prices`,
+          }
+        ],
+      })
+      .then(prod => {
+        return prod.update({
+          name : product.name,
+          description : product.description,
+        })
+        .then(() => prod.prices[0].update({ value : product.price }))
+        .then(() => {
+          if (product.unlinkUploads && product.unlinkUploads.length > 0) {
+            return uploadProductModel.destroy({
+              where : {
+                upload_uid : { $in : product.unlinkUploads },
+                product_uid : product.uid,
+              }
+            })
+          }
+          return prod;
+        })
+      })
+      .then(() => this.fetch(product.uid));
+    },
+    fetch (uid) {
+      return this.findOne({
+        where : { uid },
+        include: [
+          {
+            model: uploadModel,
+            through : uploadProductModel,
+            as : `uploads`,
+          },
+          {
+            model: priceModel,
+            as : `prices`,
+          }
+        ],
+      })
+      .then(product => product.get({ plain : true }))
+    },
+    fetchOne (...args) { return this.fetch(...args); },
+    fetchAll (options = {}) {
+      const defaultOptions = {
+        itemPerPage : 100,
+        page : 1,
+        plain : true,
+      };
+      options = Object.assign({}, defaultOptions, options);
+      return this.findAll({
+        order : `updated_at DESC`,
+        where : {},
+        offset : (options.page - 1) * options.itemPerPage,
+        limit : options.itemPerPage,
+        include: [
+          {
+            model: uploadModel,
+            through : uploadProductModel,
             as : `uploads`,
           },
           {

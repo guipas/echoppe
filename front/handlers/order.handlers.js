@@ -6,11 +6,11 @@ const pluginManager = require(`../../lib/plugins`);
 const handlers = {
   order (req, res, next) {
     return new Promise((resolve, reject) => {
-      if (req.cart) {
-        return resolve(req.cart);
+      if (req.shop.current.cart) {
+        return resolve(req.shop.current.cart);
       }
       console.log(`no cart in session`);
-      return reject({ code : 403, error : `no cart in session` });
+      return reject({ status : 403, message : `no cart in session` });
     })
     // .then(uid => db.models.cart.fetchOne(uid))
     .then(cart => {
@@ -44,11 +44,17 @@ const handlers = {
       if (req.method === `POST`) {
         if (req.body.order_action === `choose`) {
           const choice = req.body.choice;
-          req.cart.currentStep = currentStep;
-          req.cart.currentHandler = currentStep.handlers.find(handler => handler.name === choice);
-          req.cart.currentHandler.middleware(req, res, () => { 
-            res.redirect(`/order`);
-          })
+          req.shop.current.cart.currentStep = currentStep;
+          req.shop.current.cart.currentHandler = currentStep.handlers.find(handler => handler.name === choice);
+
+          try {
+            req.shop.current.cart.currentHandler.middleware(req, res, () => {
+              res.redirect(`/order`);
+            })
+          } catch (err) {
+            console.log(err);
+            return Promise.reject({ message : `Problem with plugin : ${req.shop.current.cart.currentHandler.plugin}` })
+          }
           console.log(`choice : ${choice}`);
 
           

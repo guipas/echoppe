@@ -24,9 +24,11 @@ router.post(`/register`, helpers.loginRedirect, (req, res, next) =>
   //   email : req.body.email,
   //   password : req.body.password,
   // }))
-  .then(() => db.models.user.make({
+  .then(() => db.models.user.count())
+  .then(usersCount => db.models.user.make({
     email : req.body.email,
     password : req.body.password,
+    role : usersCount === 0 ? `admin` : null,
   }))
   .then(user => {
     passport.authenticate('local', (err, user, info) => {

@@ -1,10 +1,8 @@
 'use strict';
 
-const db = require(`../../db/db`);
-
 const handlers = {
   list (req, res) {
-    return db.models.media.find()
+    return req.shop.models.upload.fetchAll()
     .then(medias => {
       if (req.wantsJson) {
         res.json(medias);

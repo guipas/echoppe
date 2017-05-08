@@ -1,20 +1,14 @@
 'use strict';
 
 const db = require(`../../db/db`);
-const path = require(`path`);
-
 
 const handlers = {
   list (req, res) {
-    if (req.session.cartUid) {
-      return db.models.cart.fetchOne(req.session.cartUid)
-      .then(cart => {
-        console.log(cart);
+    if (req.shop.current.cart) {
         if (req.wantsJson) {
-          res.json(cart);
-        } else res.render(`cart`, { cart });
+          res.json(req.shop.current.cart);
+        } else res.render(`cart`, { cart : req.shop.current.cart });
         return null;
-      })
     }
     console.log(`no cart in session`);
     if (res.wantsJson) res.json({});

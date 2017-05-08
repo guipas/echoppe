@@ -3,6 +3,9 @@
   <% medias.forEach( media => { %>
     <div class="media">
       <div class="media-inner">
+        <div class="media-image">
+          <img src="<%= linkToFront('image',media.uid) %>" alt="">
+        </div>
         <div class="media-name">
             <%- media.name %>
         </div>

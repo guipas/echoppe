@@ -27,7 +27,7 @@ const plugin = {
       label : `pay with magic money`,
       middleware : (req, res, next) => {
         console.log(`### MIDDLEWARE PLUGIN`);
-        req.echoppe.db.models.cart.fulfillStep(req.cart.uid, req.cart.currentStep.name, req.cart.currentHandler.name)
+        return req.shop.models.cart.fulfillStep(req.shop.current.cart.uid, req.shop.current.cart.currentStep.name, req.shop.current.cart.currentHandler.name)
         .then(() => {
           next();
         })

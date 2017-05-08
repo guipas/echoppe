@@ -7,6 +7,7 @@ const priceModel = require(`./price.model`);
 const cartProductModel = require(`./cart_product.model`);
 const stepFulfillmentModel = require(`./step_fulfillment.model`);
 const stepModel = require(`./step.model`);
+const userModel = require(`./user.model`);
 const pluginManager = require(`../../lib/plugins`);
 
 const CART_NEW = 0;
@@ -64,7 +65,7 @@ const cartModel = sequelize.define(`cart`, {
           return cartProduct.increment(`quantity`);
         })
       },
-      putProduct (cartUid, productUid) {
+      putProduct (cartUid, productUid, userUid) {
         let product = null;
 
         console.log(`finding product before adding it to cart...`);
@@ -78,7 +79,7 @@ const cartModel = sequelize.define(`cart`, {
         .then(cart => {
           if (!cart) {
             console.log(`no cart, creating...`);
-            return this.create().then(cart => cart.addProduct(product).then(() => cart));
+            return this.create({ user_uid : userUid }).then(cart => cart.addProduct(product).then(() => cart));
           }
           console.log(`existing cart, adding to cart`);
           // return cart.addProduct(product)
@@ -89,7 +90,7 @@ const cartModel = sequelize.define(`cart`, {
           })
           .then(() => cart);
         })
-        .then(cart => this.fetchOne({ where : { uid : cart.uid } }))
+        .then(cart => this.fetchOne(cart.uid))
       },
       removeProduct (cartUid, productUid) {
         return cartProductModel.destroy({
@@ -167,6 +168,32 @@ const cartModel = sequelize.define(`cart`, {
           } else {
             return cart.update({ status : CART_COMPLETED })
           }
+        })
+      },
+      fetchAll (options = {}) {
+        const defaultOptions = {
+          status : [CART_PROCESSING, CART_ORDERED],
+          itemPerPage : 100,
+          page : 1,
+          plain : true,
+        };
+        options = Object.assign({}, defaultOptions, options);
+        return this.findAll({
+          order: `updated_at DESC`,
+          offset : (options.page - 1) * options.itemPerPage,
+          limit : options.itemPerPage,
+          where : {
+            status : { $in : options.status }
+          },
+          include : [
+            { model : userModel }
+          ]
+        })
+        .then(orders => {
+          if (options.plain) {
+            return orders.map(o => o.get({ plain : true }));
+          }
+          return orders;
         })
       }
 

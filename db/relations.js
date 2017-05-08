@@ -8,15 +8,19 @@ const cartModel = require(`./models/cart.model`);
 const cartProductModel = require(`./models/cart_product.model`);
 const stepModel = require(`./models/step.model`);
 const stepFulfillmentModel = require(`./models/step_fulfillment.model`);
+const uploadProductModel = require(`./models/upload_product.model`);
 
-productModel.hasMany(priceModel, { as: `prices` })
+productModel.hasMany(priceModel, { as: `prices` });
 priceModel.belongsTo(productModel);
 
-uploadModel.belongsToMany(productModel, { through : `upload_product`, as : `products` })
-productModel.belongsToMany(uploadModel, { through : `upload_product`, as : `uploads` });
+// productModel.hasMany(productModel, { as : `children` });
+productModel.belongsTo(productModel, { as : `parent` });
+
+uploadModel.belongsToMany(productModel, { through : uploadProductModel, as : `products` });
+productModel.belongsToMany(uploadModel, { through : uploadProductModel, as : `uploads` });
 
 cartModel.belongsTo(userModel);
-cartModel.belongsToMany(productModel, { through : cartProductModel, as : `products` })
+cartModel.belongsToMany(productModel, { through : cartProductModel, as : `products` });
 productModel.belongsToMany(cartModel, { through : cartProductModel, as : `carts` });
 
 cartModel.hasMany(stepFulfillmentModel, { as : `stepFulfillments` });

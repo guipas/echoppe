@@ -1,22 +1,19 @@
 'use strict';
 
-const db = require(`../../db/db`);
-const path = require(`path`);
-
 const handlers = {
   getImage (req, res) {
     const name = req.params.name;
     console.log(req.query);
     const format = req.query && req.query.format ? req.query.format : null;
-    return db.models.media.getImagePath(name, format)
-    .then(media => {
+    return req.shop.models.upload.getWithThumbnail(name, format)
+    .then(upload => {
       console.log(`path returned : `);
-      console.log(media.fileFormatPath);
-      return res.sendFile(media.fileFormatPath, {
+      console.log(upload.thumbnail);
+      return res.sendFile(upload.thumbnail, {
         // root : path.join(__dirname, `..`, `..`),
         headers : { 
           'Content-Disposition' : `inline`,
-          'Content-Type' : media.mimetype,
+          'Content-Type' : upload.mimetype,
         },
       });
     })
