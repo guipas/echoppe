@@ -12,7 +12,7 @@ const mediaHandlers = require(`./handlers/media.handlers`);
 const pluginsHandlers = require(`./handlers/plugins.handlers`);
 const stepsHandlers = require(`./handlers/steps.handlers`);
 const ordersHandlers = require(`./handlers/orders.handlers`);
-
+const taxonomiesHandlers = require(`./handlers/taxonomies.handlers`);
 
 admin.locals.config = require(`../config`);
 admin.locals.linkTo = (...adminRoute) => `${admin.locals.config.site.url}/${path.join(`admin`, ...adminRoute)}`;
@@ -45,5 +45,8 @@ admin.get(`/steps`, stepsHandlers.list);
 admin.post(`/steps/:step`, stepsHandlers.triggerActivation);
 
 admin.get(`/orders`, ordersHandlers.list);
+
+admin.get(`/taxonomies`, taxonomiesHandlers.list);
+admin.post(`/taxonomies`, taxonomiesHandlers.save);
 
 module.exports = admin;

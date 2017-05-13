@@ -103,8 +103,8 @@ app.use((err, req, res, next) => {
 });
 
 app.init = () => {
-  return db.sequelize.sync({ force : true })
-  // return db.sequelize.sync()
+  // return db.sequelize.sync({ force : true })
+  return db.sequelize.sync()
   .then(() => {
     pluginManager.init(db);
   })

@@ -31,8 +31,19 @@ const adminRequired = (req, res, next) => {
 }
 
 const loginRedirect = (req, res, next) => {
-  if (req.user) return res.status(401).json(
-    { status: 'You are already logged in' });
+  if (req.user) {
+    if (req.wantsJson) {
+      return res.status(401).json({ status: 'You are already logged in' });
+    }
+
+    if (req.user.role === `admin`) {
+      res.redirect(`/admin`);
+      return null;
+    }
+
+    res.redirect(`/`);
+    return null;
+  }
   return next();
 }
 

@@ -20,10 +20,6 @@ router.get(`/login`, (req, res, next) => {
 
 router.post(`/register`, helpers.loginRedirect, (req, res, next) =>
   helpers.validateCredentials(req)
-  // .then(() => db.models.user.create({
-  //   email : req.body.email,
-  //   password : req.body.password,
-  // }))
   .then(() => db.models.user.count())
   .then(usersCount => db.models.user.make({
     email : req.body.email,
@@ -37,9 +33,28 @@ router.post(`/register`, helpers.loginRedirect, (req, res, next) =>
         throw new Error(err);
       }
       if (user) {
-        handleResponse(res, 200, 'success');
+        if (req.wantsJson) {
+          handleResponse(res, 200, 'success');
+          return null;
+        }
+
+        if (user.role === `admin`) {
+          res.redirect(`/admin`);
+          return null;
+        }
+
+        res.redirect(`/`);
+        return null;
+
       }
-      else  handleResponse(res, 500, 'error');
+      if (req.wantsJson) {
+        handleResponse(res, 500, 'error');
+        return null;
+      }
+
+      req.redirect(`/auth/register`);
+      return null;
+
     })(req, res, next);
     return null;
   })
@@ -52,14 +67,25 @@ router.post(`/register`, helpers.loginRedirect, (req, res, next) =>
 )
 
 
-router.post('/login', helpers.loginRedirect, (req, res, next) => {
+router.post(`/login`, helpers.loginRedirect, (req, res, next) => {
   passport.authenticate('local', (err, user, info) => {
     if (err) { handleResponse(res, 500, 'error'); }
     if (!user) { handleResponse(res, 404, 'User not found'); }
     if (user) {
       req.logIn(user, function (err) {
         if (err) { handleResponse(res, 500, 'error'); }
-        handleResponse(res, 200, 'success');
+
+        if (req.wantsJson) {
+          handleResponse(res, 200, 'success');
+          return null;
+        }
+
+        if (user.role === `admin`) {
+          res.redirect(`/admin`);
+          return null;
+        }
+
+        res.redirect(`/`);
       });
     }
   })(req, res, next);
