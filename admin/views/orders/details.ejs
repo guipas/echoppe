@@ -1,0 +1,19 @@
+<%- include(`../partials/header`) %>
+<div class="card">
+  <div class="card-block">
+  <h4 class="card-title">Order details <small><%= order.uid %></small></h4>
+    <div class="status">Status : <code><%= order.status %> - <%= order.statusLabel %></code></div>
+    <hr>
+    <h5>User</h5>
+    <% if (!order.user) { %>
+      <em class="text-muted">No user attached to this order</em>
+    <% } else { %>
+      <%= order.user.firstname %>
+      <%= order.user.lastname %>
+      <small>
+        ( <%= order.user.email %> )
+      </small>
+    <% } %>
+  </div>
+</div>
+<%- include(`../partials/footer`) %>

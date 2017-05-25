@@ -11,6 +11,7 @@ const stepFulfillmentModel = require(`./models/step_fulfillment.model`);
 const uploadProductModel = require(`./models/upload_product.model`);
 const taxonomyModel = require(`./models/taxonomy.model`);
 const termModel = require(`./models/term.model`);
+const productTermModel = require(`./models/product_term.model`);
 
 
 productModel.hasMany(priceModel, { as: `prices` });
@@ -32,6 +33,6 @@ stepModel.hasMany(stepFulfillmentModel, { as : `stepFulfillments` });
 
 taxonomyModel.hasMany(termModel, { as : `terms` });
 termModel.belongsTo(taxonomyModel);
-termModel.belongsToMany(productModel, { through : `product_term`, as : `products` });
-productModel.belongsToMany(termModel, { through : `product_term`, as : `terms` });
+termModel.belongsToMany(productModel, { through : productTermModel, as : `products` });
+productModel.belongsToMany(termModel, { through : productTermModel, as : `terms` });
 

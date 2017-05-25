@@ -1,31 +1,25 @@
-<ul class="menu">
-  <li>
-    <a href="<%- linkToFront() %>">Go to front</a>
-  </li>
-  <li class="menu-item">
-    <a href="<%- linkTo(`/`) %>">Admin</a>
-  </li>
-  <li class="menu-item">
-    <a href="<%- linkTo(`/products`) %>">Product list</a>
-  </li>
-  <li>
-    <a href="<%- linkTo(`/product/create`) %>">Create product</a>
-  </li>
-  <!--
-  <li>
-    <a href="<%- linkTo(`/images`) %>">List images</a>
-  </li>
-  <li>
-    <a href="<%- linkTo(`/plugins`) %>">Plugins</a>
-  </li>
-  <li>
-    <a href="<%- linkTo(`/steps`) %>">Steps</a>
-  </li>
-  -->
-  <li>
-    <a href="<%- linkTo(`/taxonomies`) %>">Taxonomies</a>
-  </li>
-  <li>
-    <a href="<%- linkTo(`/orders`) %>">Orders</a>
-  </li>
-</ul>
+<div class="menu">
+  <ul>
+    <li>
+      <a href="<%- linkToFront() %>"><i class="fa fa-hand-o-left" aria-hidden="true"></i> Go to front</a>
+    </li>
+    <li class="menu-item">
+      <a href="<%- linkTo(`/products`) %>"><i class="fa fa-gift" aria-hidden="true"></i> Product list</a>
+    </li>
+    <li>
+      <a href="<%- linkTo(`/product/create`) %>"><i class="fa fa-pencil" aria-hidden="true"></i> Create product</a>
+    </li>
+    <li>
+      <a href="<%- linkTo(`/plugins`) %>"><i class="fa fa-plug" aria-hidden="true"></i> Plugins</a>
+    </li>
+    <li>
+      <a href="<%- linkTo(`/steps`) %>"><i class="fa fa-server" aria-hidden="true"></i> Order Steps</a>
+    </li>
+    <li>
+      <a href="<%- linkTo(`/taxonomies`) %>"><i class="fa fa-tags" aria-hidden="true"></i> Taxonomies</a>
+    </li>
+    <li>
+      <a href="<%- linkTo(`/orders`) %>"><i class="fa fa-shopping-cart" aria-hidden="true"></i> Orders</a>
+    </li>
+  </ul>
+</div>

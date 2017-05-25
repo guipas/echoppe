@@ -1,7 +1,7 @@
 <%- include(`../partials/header`) %>
 
-<h2>Products List</h2>
 <div class="product-list list-group">
+<h2 class="list-group-item">Products List</h2>
   <% products.forEach( (product,i) => { %>
     <a class="product list-group-item list-group-item-action flex-column align-items-start" href="<%- linkTo('product',product.uid) %>">
       <div class="product-inner d-flex w-100 justify-content-between">
@@ -12,7 +12,7 @@
           <small><%= product.price.value %><%= shop.helpers.getCurrencySymbol(product.price.currency) %></small>
         <% } %>
       </div>
-      <p class="product-description mb-1"><%- product.description %></p>
+      <p class="product-description mb-1"><%- product.description ? product.description.slice(0, 100) : '&nbsp;' %></p>
     </a>
   <% }) %><!-- end product.forEach -->
 </div>

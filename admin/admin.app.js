@@ -26,7 +26,8 @@ admin.set(`view engine`, `ejs`);
 admin.use(authHelpers.adminRequired);
 
 admin.get(`/`, (req, res) => {
-   res.status(200).json({ status: 'success' });
+  //  res.status(200).json({ status: 'success' });
+  res.redirect(admin.locals.linkTo(`/products`));
 })
 
 admin.get(`/products`, productsHandlers.list);
@@ -45,6 +46,7 @@ admin.get(`/steps`, stepsHandlers.list);
 admin.post(`/steps/:step`, stepsHandlers.triggerActivation);
 
 admin.get(`/orders`, ordersHandlers.list);
+admin.get(`/order/:order`, ordersHandlers.details);
 
 admin.get(`/taxonomies`, taxonomiesHandlers.list);
 admin.post(`/taxonomies`, taxonomiesHandlers.save);

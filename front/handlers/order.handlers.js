@@ -5,6 +5,7 @@ const pluginManager = require(`../../lib/plugins`);
 
 const handlers = {
   order (req, res, next) {
+    console.log(`### begin order process...`);
     return new Promise((resolve, reject) => {
       if (req.shop.current.cart) {
         return resolve(req.shop.current.cart);

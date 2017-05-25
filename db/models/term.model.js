@@ -17,6 +17,11 @@ const termModel = sequelize.define(`term`, {
       allowNull : false,
     },
 
+    order : {
+      type : Sequelize.INTEGER,
+      defaultValue: 0,
+    },
+
   }, {
     freezeTableName: true,
     underscored: true,

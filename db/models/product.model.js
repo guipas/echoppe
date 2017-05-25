@@ -6,6 +6,9 @@ const sequelize = require(`../sequelize`);
 const uploadModel = require(`./upload.model`);
 const priceModel = require(`./price.model`);
 const uploadProductModel = require(`./upload_product.model`);
+const termModel = require(`./term.model`);
+const productTermModel = require(`./product_term.model`);
+
 const config = require(`../../config`);
 
 const productModel = sequelize.define(`product`, {
@@ -80,8 +83,6 @@ const productModel = sequelize.define(`product`, {
           filename: path.basename(file.path),
         }))
       }
-      console.log(`price :`);
-      console.log(product.price);
       return this.create({
         name : product.name,
         description : product.description,
@@ -93,8 +94,27 @@ const productModel = sequelize.define(`product`, {
           { model: priceModel, as: `prices` },
         ],
       })
+      .then(prod => {
+        const terms = Object.keys(product.taxonomies)
+          .map(k => ({
+            term_uid : product.taxonomies[k],
+            product_uid : prod.uid,
+          }))
+          .filter(term => term.term_uid.length > 0);
+        return productTermModel.bulkCreate(terms)
+        .then(() => prod)
+      })
     },
     modify (product, files) {
+      console.log(product);
+      let uploads = [];
+      if (files && files.length) {
+        uploads = files.map(file => ({
+          name: file.originalname,
+          mimetype: file.mimetype,
+          filename: path.basename(file.path),
+        }))
+      }
       return this.findOne({
         where : { uid : product.uid },
         include: [
@@ -126,6 +146,20 @@ const productModel = sequelize.define(`product`, {
           }
           return prod;
         })
+        .then(() => uploadModel.bulkCreate(uploads))
+        .then(uploads => uploadProductModel.bulkCreate(uploads.map(u => ({ product_uid : prod.uid, upload_uid : u.uid }))))
+        .then(() => {
+          const terms = Object.keys(product.taxonomies)
+            .map(k => ({
+              term_uid : product.taxonomies[k],
+              product_uid : prod.uid,
+            }))
+            .filter(term => term.term_uid.length > 0);
+          // console.log(`terms :`);
+          // console.log(terms);
+          return productTermModel.destroy({ where : { product_uid : prod.uid } })
+          .then(() => productTermModel.bulkCreate(terms))
+        })
       })
       .then(() => this.fetch(product.uid));
     },
@@ -141,6 +175,11 @@ const productModel = sequelize.define(`product`, {
           {
             model: priceModel,
             as : `prices`,
+          },
+          {
+            model : termModel,
+            as : `terms`,
+            through : productTermModel,
           }
         ],
       })

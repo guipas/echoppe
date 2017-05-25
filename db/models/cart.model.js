@@ -15,6 +15,13 @@ const CART_PROCESSING = 5;// all steps fulfilled, order accepted but waiting for
 const CART_ORDERED = 10;// order accepted (payment validated...), we can send the products
 const CART_COMPLETED = 15;// product sent
 
+const LABELS = {
+  [CART_NEW] : ``,
+  [CART_PROCESSING] : `Processing (awaiting validation)`,
+  [CART_ORDERED] : `Accepted (products can be sent)`,
+  [CART_COMPLETED] : `Product sent`,
+};
+
 
 const cartModel = sequelize.define(`cart`, {
 
@@ -27,6 +34,13 @@ const cartModel = sequelize.define(`cart`, {
     status : {
       type: Sequelize.INTEGER,
       defaultValue : CART_NEW,
+    },
+
+    statusLabel : {
+      type: Sequelize.VIRTUAL(Sequelize.STRING),
+      get () {
+        return LABELS[this.getDataValue(`status`)];
+      }
     }
 
   }, {
@@ -41,6 +55,7 @@ const cartModel = sequelize.define(`cart`, {
           include: [
               { model: productModel, as: `products`, through : cartProductModel, include : [{ model : priceModel, as : `prices` }] },
               { model: stepFulfillmentModel, as: `stepFulfillments`, include : [{ model : stepModel, as: `step` }] },
+              { model: userModel },
             ],
         })
         .then(cart => cart.get({ plain : true }))

@@ -1,7 +1,10 @@
 <%- include(`../partials/header`) %>
-<div class="order-list">
+<div class="order-list list-group">
+<div class="list-group-item list-group-title">
+  <h4>Orders</h4>
+</div>
   <% orders.forEach( order => { %>
-    <div class="order">
+    <div class="order list-group-item">
       <div class="order-inner">
         <div class="order-uid">
             <%- order.uid %>
@@ -15,7 +18,7 @@
             <%- order.status %>
         </div>
         <div class="order-tools">
-          <a href="">Details</a>
+          <a href="<%= linkTo('order',order.uid) %>">Details</a>
         </div>
       </div>
     </div>
