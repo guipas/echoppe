@@ -2,7 +2,17 @@
 <div class="card">
   <div class="card-block">
   <h4 class="card-title">Order details <small><%= order.uid %></small></h4>
-    <div class="status">Status : <code><%= order.status %> - <%= order.statusLabel %></code></div>
+    <div class="status">
+      Status : <code><%= order.status %> - <%= order.statusLabel %></code>
+      <% if (nextStatus) { %>
+      - 
+        <form action="<%- linkTo('order',order.uid,'status') %>" method="POST">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <input type="hidden" name="status" value="<%= nextStatus %>">
+          <input type="submit" value="<%= nextLabel %>">
+        </form>
+      <% } %>
+    </div>
     <hr>
     <h5>User</h5>
     <% if (!order.user) { %>

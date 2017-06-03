@@ -47,6 +47,20 @@ const cartModel = sequelize.define(`cart`, {
     freezeTableName: true,
     underscored: true,
     classMethods : {
+      getAllPosssibleStatus () {
+        return { CART_NEW, CART_PROCESSING, CART_ORDERED, CART_COMPLETED };
+      },
+      getNextStatus (currentStatus) {
+        let i = currentStatus;
+        let nextStatus = null;
+        // const allStatus = this.getAllPosssibleStatus();
+        while (!nextStatus && i++ < 100) {
+          if (LABELS[i]) {
+            nextStatus = i;
+          }
+        }
+        return nextStatus;
+      },
       fetchOne (uid) {
         console.log(`fetching cart...`);
         console.log(uid);
@@ -174,6 +188,16 @@ const cartModel = sequelize.define(`cart`, {
           return cart;
         })
         .then(() => this.fetchOne(cartUid));
+      },
+      forceStatus (cartUid, newStatus) {
+        return this.findOne({ where : { uid : cartUid } })
+        .then(cart => {
+          if (!LABELS[newStatus]) {
+            return Promise.reject(`status does not exists`);
+          }
+          return cart.update({ status : newStatus })
+        })
+        .then(() => this.fetchOne(cartUid))
       },
       complete (cartUid, force = false) {
         return this.findOne({ where : { uid : cartUid } })

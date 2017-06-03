@@ -13,10 +13,34 @@ const handlers = {
         return null;
       }
       console.log(order);
-      return res.render(`orders/details`, { order })
+      const nextStatus = req.shop.models.cart.getNextStatus(order.status);
+      console.log(nextStatus);
+      const allStatus = req.shop.models.cart.getAllPosssibleStatus();
+      let nextLabel = null;
+      if (nextStatus === allStatus.CART_ORDERED) { nextLabel = 'Manualy validate order' }
+      else if (nextStatus === allStatus.CART_COMPLETED) { nextLabel = `Complete order (mark as sent)` }
+      res.render(`orders/details`, {
+        order,
+        csrf : req.csrfToken(),
+        nextStatus,
+        nextLabel,
+      });
+      return null;
     })
     .catch(next);
   },
+  changeStatus (req, res, next) {
+    return req.shop.models.cart.forceStatus(req.params.order, req.body.status)
+    .then(cart => {
+      if (req.wantsJson) {
+        res.json(cart);
+        return null;
+      }
+      res.redirect(req.app.locals.linkTo(`order`, cart.uid));
+      return null;
+    })
+    .catch(next);
+  }
 }
 
 module.exports = handlers;

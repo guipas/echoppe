@@ -47,6 +47,7 @@ admin.post(`/steps/:step`, stepsHandlers.triggerActivation);
 
 admin.get(`/orders`, ordersHandlers.list);
 admin.get(`/order/:order`, ordersHandlers.details);
+admin.post(`/order/:order/status`, ordersHandlers.changeStatus);
 
 admin.get(`/taxonomies`, taxonomiesHandlers.list);
 admin.post(`/taxonomies`, taxonomiesHandlers.save);
