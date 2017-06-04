@@ -33,6 +33,7 @@ npm-debug.log
 *.env
 .vscode
 /config.js
+.DS_Store
 
 /admin.old
 /todo.md
