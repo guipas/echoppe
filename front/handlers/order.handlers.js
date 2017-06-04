@@ -1,7 +1,6 @@
 'use strict';
 
 const db = require(`../../db/db`);
-const pluginManager = require(`../../lib/plugins`);
 
 const handlers = {
   order (req, res, next) {
@@ -15,7 +14,7 @@ const handlers = {
     })
     // .then(uid => db.models.cart.fetchOne(uid))
     .then(cart => {
-      const steps = pluginManager.getActiveSteps();
+      const steps = req.shop.pluginManager.getActiveSteps();
       console.log(req.method);
       console.log(cart.stepFulfillments);
       console.log(steps);

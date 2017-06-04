@@ -10,7 +10,7 @@ const plugin = {
   hooks : [
     // 'front:views:hooks:index' : () => `hello from plugin !`,
     {
-      name : 'front:views:hooks:index',
+      name : 'front:views:head',
       order: 1,
       handler : () => `hello from plugin !`,
     }
@@ -23,7 +23,7 @@ const plugin = {
     {
       step : `order:payment`,
       name : `hello:stepHandler:1`,
-      sort : 1,
+      priority : 1,
       label : `pay with magic money`,
       middleware : (req, res, next) => {
         console.log(`### MIDDLEWARE PLUGIN`);

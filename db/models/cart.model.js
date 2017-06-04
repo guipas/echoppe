@@ -8,7 +8,7 @@ const cartProductModel = require(`./cart_product.model`);
 const stepFulfillmentModel = require(`./step_fulfillment.model`);
 const stepModel = require(`./step.model`);
 const userModel = require(`./user.model`);
-const pluginManager = require(`../../lib/plugins`);
+const pluginManager = require(`../../lib/plugin_manager`);
 
 const CART_NEW = 0;
 const CART_PROCESSING = 5;// all steps fulfilled, order accepted but waiting for external validation

@@ -1,13 +1,12 @@
 'use strict';
 
 const db = require(`../../db/db`);
-const pluginManager = require(`../../lib/plugins`);
 
 const handlers = {
   list (req, res) {
     return db.models.option.fetchValue(`core:activated_plugins`)
     .then(activatedPlugins => {
-      const plugins = pluginManager.plugins.map(plugin => {
+      const plugins = req.shop.pluginManager.plugins.map(plugin => {
         let isActive = false;
         if (activatedPlugins) {
           const pluginInfo = activatedPlugins.find(p => p.name === plugin.name)

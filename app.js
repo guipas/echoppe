@@ -16,9 +16,12 @@ const wantsJson = require(`./lib/wantsJson`);
 const SequelizeSessionStore = require(`connect-session-sequelize`)(session.Store);
 const sequelize = require(`./db/sequelize`);
 const db = require(`./db/db`);
-const pluginManager = require(`./lib/plugins`);
+const pluginManager = require(`./lib/plugin_manager`);
 // const cartMiddleware = require(`./lib/cart.middleware`);
 const echoppeMiddleware = require(`./lib/echoppe.middleware`);
+const firstTime = require(`./lib/first_time`);
+const firstTimeMiddleware = require(`./lib/first_time.middleware`);
+const seed = require(`./lib/seed`);
 
 const sequelizeSessionStore = new SequelizeSessionStore({
   db: sequelize
@@ -29,7 +32,8 @@ const app = express();
 
 // set locals :
 app.locals.config = config;
-app.locals.linkTo = routeName => `${config.site.url}${path.join(`/`, routeName)}`;
+// app.locals.linkTo = routeName => `${config.site.url}${path.join(`/`, routeName)}`;
+app.locals.linkTo = (...routes) => `${config.site.url}${path.join(`/`, ...routes)}`;
 
 // view engine setup
 app.set(`views`, [
@@ -69,9 +73,10 @@ initLocalPassport();
 
 // app.use(cartMiddleware);
 app.use(echoppeMiddleware);
+// app.use(firstTimeMiddleware);
 
-app.use(`/admin`, require(`./admin/admin.app`));
-app.use(`/auth`, require(`./auth/routes`));
+app.use(`/admin`, firstTimeMiddleware, require(`./admin/admin.app`));
+app.use(`/auth`, firstTimeMiddleware, require(`./auth/routes`));
 app.use(`/`, require(`./front/front.routes`));
 
 // catch 404 and forward to error handler
@@ -105,6 +110,14 @@ app.use((err, req, res, next) => {
 app.init = () => {
   // return db.sequelize.sync({ force : true })
   return db.sequelize.sync()
+  .then(firstTime.launching)
+  .then(isFirstTime => {
+    if (isFirstTime) {
+      console.log(`Launching app for the first time, seeding DB...`);
+      return seed();
+    }
+    return null;
+  })
   .then(() => {
     pluginManager.init(db);
   })

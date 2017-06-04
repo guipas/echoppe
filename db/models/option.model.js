@@ -52,9 +52,18 @@ const optionModel = sequelize.define(`option`, {
       fetchValue (name) {
         return this.fetch(name).then(option => option.value);
       },
-      getOptionsByGroup (group) {
-        return this.find({ where : { group } })
-        .then(options => options.map(option => ({ name : option.name, value : this._getParsedValue(option) })));
+      getOptionsByGroup (group, defaults = []) {
+        return this.findAll({ where : { group } })
+        .then(options => options.map(option => ({ name : option.name, value : this._getParsedValue(option), type : option.type, group : option.group })))
+        .then(options => {
+          defaults.forEach(defaultOption => {
+            const option = options.find(o => o.name === defaultOption.name);
+            if (!option) {
+              options.push(defaultOption);
+            }
+          })
+          return options;
+        })
       },
       setValue (name, value, type) {
         return this.setOption({ name, value, type });

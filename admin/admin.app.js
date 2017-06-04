@@ -5,6 +5,7 @@ const path = require(`path`);
 const admin = express();
 const authHelpers = require(`../auth/helpers`);
 const upload = require(`../lib/upload`);
+const safe = require(`../lib/safe_promise_handler`);
 
 const productHandlers = require(`./handlers/product.handlers`);
 const productsHandlers = require(`./handlers/products.handlers`);
@@ -13,6 +14,7 @@ const pluginsHandlers = require(`./handlers/plugins.handlers`);
 const stepsHandlers = require(`./handlers/steps.handlers`);
 const ordersHandlers = require(`./handlers/orders.handlers`);
 const taxonomiesHandlers = require(`./handlers/taxonomies.handlers`);
+const optionsHandlers = require(`./handlers/options.handlers`);
 
 admin.locals.config = require(`../config`);
 admin.locals.linkTo = (...adminRoute) => `${admin.locals.config.site.url}/${path.join(`admin`, ...adminRoute)}`;
@@ -51,5 +53,8 @@ admin.post(`/order/:order/status`, ordersHandlers.changeStatus);
 
 admin.get(`/taxonomies`, taxonomiesHandlers.list);
 admin.post(`/taxonomies`, taxonomiesHandlers.save);
+
+admin.get(`/options`, safe(optionsHandlers.list));
+
 
 module.exports = admin;
