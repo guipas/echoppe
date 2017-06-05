@@ -4,11 +4,12 @@
 <div class="card-block">
   <h2 class="card-title">Options</h2>
   <form action="" method="POST">
+  <input type="hidden" name="_csrf" value="<%= csrf %>">
     <% options.forEach( (option,i) => { %>
       <div class="form-group row">
         <label class="col-form-label col-md-2" for="<%= option.name %>"><%= option.name %></label>
         <div class="col-md-10">
-          <input class="form-control" type="text" name="<%= option.name %>" value="<%= option.value %>">
+          <input class="form-control" type="text" name="options[<%= option.name %>]" value="<%= option.value %>">
         </div>
       </div>
     <% }) %><!-- end product.forEach -->

@@ -55,6 +55,7 @@ admin.get(`/taxonomies`, taxonomiesHandlers.list);
 admin.post(`/taxonomies`, taxonomiesHandlers.save);
 
 admin.get(`/options`, safe(optionsHandlers.list));
+admin.post(`/options`, safe(optionsHandlers.save));
 
 
 module.exports = admin;

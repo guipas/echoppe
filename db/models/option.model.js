@@ -65,12 +65,20 @@ const optionModel = sequelize.define(`option`, {
           return options;
         })
       },
-      setValue (name, value, type) {
-        return this.setOption({ name, value, type });
+      setValue (name, value, type = null, group = null) {
+        const option = { name, value };
+        if (type) option.type = type;
+        if (group) option.group = group;
+        return this.setOption(option);
       },
       setOption (option) {
         return this.upsert(this._prepareBeforeSave(option))
         .then(() => this.fetch(option.name))
+      },
+      setOptions (options) {
+        return Promise.all(options.map(option => {
+          return this.setOption(option);
+        }))
       }
     },
   }
