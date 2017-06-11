@@ -10,18 +10,25 @@ const cartHandlers = require(`./handlers/cart.handlers`);
 const orderHandlers = require(`./handlers/order.handlers`);
 const homeHandlers = require(`./handlers/home.handlers`);
 const safe = require(`../lib/safe_promise_handler`);
+const pages = require(`../lib/pages`);
 
+const front = config => {
 
-router.get(`/`, safe(homeHandlers.home));
+  router.get(`/`, safe(homeHandlers.home));
 
-router.get(`/image/:name`, mediaHandlers.getImage);
+  router.get(`/image/:name`, mediaHandlers.getImage);
 
-router.get(`/products`, productsHandlers.list);
+  router.get(`/products`, productsHandlers.list);
+  router.get(`/product/:product`, safe(productHandlers.show));
 
-router.post(`/cart/product/:product`, cartHandlers.addProduct);
-router.get(`/cart`, cartHandlers.list);
+  router.post(`/cart/product/:product`, cartHandlers.addProduct);
+  router.get(`/cart`, cartHandlers.list);
 
-router.all(`/order`, orderHandlers.order);
+  router.all(`/order`, orderHandlers.order);
 
+  pages(config).then(middleware => router.get(`/pages/:page`, middleware));
 
-module.exports = router;
+  return router;
+}
+
+module.exports = front;

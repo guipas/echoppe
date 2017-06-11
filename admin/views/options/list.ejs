@@ -7,7 +7,7 @@
   <input type="hidden" name="_csrf" value="<%= csrf %>">
     <% options.forEach( (option,i) => { %>
       <div class="form-group row">
-        <label class="col-form-label col-md-2" for="<%= option.name %>"><%= option.name %></label>
+        <label class="col-form-label col-md-2" for="<%= option.name %>"><%= option.label ? option.label : option.name %></label>
         <div class="col-md-10">
           <input class="form-control" type="text" name="options[<%= option.name %>]" value="<%= option.value %>">
         </div>

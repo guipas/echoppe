@@ -13,7 +13,7 @@ const optionModel = sequelize.define(`option`, {
       unique : true,
     },
 
-    group : {
+    label : {
       type: Sequelize.STRING,
       defaultValue : ``,
     },
@@ -53,7 +53,7 @@ const optionModel = sequelize.define(`option`, {
         return this.fetch(name).then(option => option.value);
       },
       getOptionsByGroup (group, defaults = []) {
-        return this.findAll({ where : { group } })
+        return this.findAll({ where : { name : { $like : `${group}:%` } } })
         .then(options => options.map(option => ({ name : option.name, value : this._getParsedValue(option), type : option.type, group : option.group })))
         .then(options => {
           defaults.forEach(defaultOption => {

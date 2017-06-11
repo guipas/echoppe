@@ -2,6 +2,20 @@
 
 
 module.exports = {
+  option : [
+    {
+      name : `shop_settings:name`,
+      label : `Site name`,
+      value : `Echoppe`,
+      type : `string`,
+    },
+    {
+      name : `shop_settings:description`,
+      label : `Site description`,
+      value : `Echoppe`,
+      type : `string`,
+    },
+  ],
   product : [
     {
       uid : `ee91f46e-5bc3-4942-8b0c-07e9ffbd4ce4`,

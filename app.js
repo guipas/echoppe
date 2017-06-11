@@ -17,7 +17,6 @@ const SequelizeSessionStore = require(`connect-session-sequelize`)(session.Store
 const sequelize = require(`./db/sequelize`);
 const db = require(`./db/db`);
 const pluginManager = require(`./lib/plugin_manager`);
-// const cartMiddleware = require(`./lib/cart.middleware`);
 const echoppeMiddleware = require(`./lib/echoppe.middleware`);
 const firstTime = require(`./lib/first_time`);
 const firstTimeMiddleware = require(`./lib/first_time.middleware`);
@@ -32,8 +31,8 @@ const app = express();
 
 // set locals :
 app.locals.config = config;
-// app.locals.linkTo = routeName => `${config.site.url}${path.join(`/`, routeName)}`;
 app.locals.linkTo = (...routes) => `${config.site.url}${path.join(`/`, ...routes)}`;
+app.locals.themePublicUrl = (...routes) =>  app.locals.linkTo(`themes`, config.theme, `public`, ...routes);
 
 // view engine setup
 app.set(`views`, [
@@ -43,7 +42,9 @@ app.set(`view engine`, `ejs`);
 
 app.use(wantsJson);
 app.use(`/public`, express.static(path.join(__dirname, 'public')));
-// app.use(upload);
+app.use(`/themes/${config.theme}/public`, express.static(path.join(__dirname, `content`, `themes`, config.theme, `public`)));
+
+
 // uncomment after placing your favicon in /public
 // app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger(`dev`));
@@ -77,7 +78,7 @@ app.use(echoppeMiddleware);
 
 app.use(`/admin`, firstTimeMiddleware, require(`./admin/admin.app`));
 app.use(`/auth`, firstTimeMiddleware, require(`./auth/routes`));
-app.use(`/`, require(`./front/front.routes`));
+app.use(`/`, require(`./front/front.routes`)(config));
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
@@ -93,18 +94,17 @@ app.use((err, req, res, next) => {
   res.locals.message = err.message;
   res.locals.error = req.app.get(`env`) === `development` ? err : {};
 
+  if (err.originalError) { console.log(err.originalError) }
   console.log(err);
 
   // render the error page
   res.status(err.status || 500);
-  // res.render('error');
-  if (err instanceof Error) {
-    res.send(`error`);
-  } else if (typeof err === `object` && err.message) {
-    res.send(err.message);
-  } else {
-    res.send(`Error`);
+
+  if (req.wantsJson) {
+    return res.json({ message : res.locals.message, error : res.locals.error })
   }
+
+  return res.render(`error`);
 });
 
 app.init = () => {
