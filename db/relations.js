@@ -12,6 +12,7 @@ const uploadProductModel = require(`./models/upload_product.model`);
 const taxonomyModel = require(`./models/taxonomy.model`);
 const termModel = require(`./models/term.model`);
 const productTermModel = require(`./models/product_term.model`);
+const addressModel = require(`./models/address.model`);
 
 
 productModel.hasMany(priceModel, { as: `prices` });
@@ -36,3 +37,5 @@ termModel.belongsTo(taxonomyModel);
 termModel.belongsToMany(productModel, { through : productTermModel, as : `products` });
 productModel.belongsToMany(termModel, { through : productTermModel, as : `terms` });
 
+userModel.hasMany(addressModel);
+cartModel.hasOne(addressModel, { as : `shipping_address` });

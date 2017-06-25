@@ -28,6 +28,7 @@ const optionModel = require(`./models/option.model`);
 const stepModel = require(`./models/step.model`);
 const taxonomyModel = require(`./models/taxonomy.model`);
 const uploadProductModel = require(`./models/upload_product.model`);
+const addressModel = require(`./models/address.model`);
 
 require(`./relations`);
 
@@ -43,5 +44,6 @@ module.exports = {
     step : stepModel,
     taxonomy : taxonomyModel,
     upload_product : uploadProductModel,
+    address : addressModel,
   },
 };

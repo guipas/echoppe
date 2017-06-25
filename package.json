@@ -5,6 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "node start.js",
+    "postinstall" : "node ./scripts/npm_install_plugins.js",
     "test": "./node_modules/mocha/bin/_mocha"
   },
   "keywords": [],

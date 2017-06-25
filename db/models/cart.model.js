@@ -61,6 +61,7 @@ const cartModel = sequelize.define(`cart`, {
         }
         return nextStatus;
       },
+      fetch (uid) { return this.fetchOne(uid) },
       fetchOne (uid) {
         console.log(`fetching cart...`);
         console.log(uid);
@@ -234,6 +235,10 @@ const cartModel = sequelize.define(`cart`, {
           }
           return orders;
         })
+      },
+      setShippingAddress (cartUid, addressUid) {
+        return this.update({ shipping_address : addressUid }, { where : { uid : cartUid } })
+        .then(() => this.fetch(cartUid));
       }
 
     }

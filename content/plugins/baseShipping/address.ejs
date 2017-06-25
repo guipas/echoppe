@@ -1,0 +1,52 @@
+<%- include(shop.theme.headerPath) %>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-xl-6">
+      <h4>Shipping address </h4>
+      <p>
+        Fill your shipping address <small><a href="<%= linkTo('auth', 'login'); %>">or login if you have an account &rarr;</a></small>
+      </p>
+      <hr>
+      <form action="" method ="POST">
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <input type="hidden" name="plugin_action" value="validate_address">
+        <div class="form-group">
+          <label for="">Email</label>
+          <input type="email" name="email" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="">Address name</label>
+          <input type="text" name="address[name]" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="">Address <small>(line 1)</small></label>
+          <input type="text" name="address[line1]" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="">Address <small>(line 2)</small></label>
+          <input type="text" name="address[line2]" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="">State</label>
+          <input type="text" name="address[state]" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="">City</label>
+          <input type="text" name="address[city]" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="">Zip code</label>
+          <input type="text" name="address[zipcode]" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="">Country</label>
+          <input type="text" name="address[country]" class="form-control">
+        </div>
+        <div class="text-right">
+          <input type="submit" value="Save" class="btn btn-outline-primary">
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<%- include(shop.theme.footerPath) %>

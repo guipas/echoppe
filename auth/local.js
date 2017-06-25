@@ -47,7 +47,7 @@ module.exports = () => {
     // return db.models.user.findOne({ email })
     return db.models.user.fetchByEmail(email)
     .then((user) => {
-      if (!user) return done(null, false);
+      if (!user || !user.active) return done(null, false);
       if (!comparePass(password, user.password)) {
         return done(null, false);
       }

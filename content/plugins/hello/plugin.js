@@ -17,17 +17,18 @@ const plugin = {
   ],
   events : [],
   steps : [
-    { name : `order:payment`, sort : 1000 },
+    { name : `order:payment`, sort : 1000, activatedByDefault : true },
   ],
   stepHandlers : [
     {
       step : `order:payment`,
       name : `hello:stepHandler:1`,
+      activatedByDefault : true,
       priority : 1,
       label : `pay with magic money`,
       middleware : (req, res, next) => {
         console.log(`### MIDDLEWARE PLUGIN`);
-        return req.shop.models.cart.fulfillStep(req.shop.current.cart.uid, req.shop.current.cart.currentStep.name, req.shop.current.cart.currentHandler.name)
+        return req.shop.models.cart.fulfillStep(req.shop.current.cart.uid, req.shop.current.step.name, req.shop.current.stepHandler.name)
         .then(() => {
           next();
         })

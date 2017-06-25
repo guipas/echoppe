@@ -35,7 +35,7 @@ const productModel = sequelize.define(`product`, {
 
   type : {
     type : Sequelize.STRING,
-    defaultValue: ``,
+    defaultValue: `real`,
   },
 
   // parent : {

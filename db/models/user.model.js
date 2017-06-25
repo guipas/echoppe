@@ -92,7 +92,7 @@ const userModel = sequelize.define(`user`, {
 
   password: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: true
   },
 
   role: {
@@ -110,6 +110,11 @@ const userModel = sequelize.define(`user`, {
     defaultValue : new Date(0),
   },
 
+  active : {
+    type : Sequelize.BOOLEAN,
+    defaultValue : false,
+  },
+
   loginLevel: {
     type: Sequelize.VIRTUAL(Sequelize.STRING, [`lastLogin`]),
     get () {
@@ -125,6 +130,11 @@ const userModel = sequelize.define(`user`, {
   classMethods: {
     make (user) {
       return new Promise((resolve, reject) => {
+        if (!user.password) {
+          user.active = false;
+          return resolve();
+        }
+        user.active = true;
         bcrypt.genSalt(10, function (err, salt) {
           if (err) return reject(err);
 
