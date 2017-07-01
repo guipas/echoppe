@@ -3,7 +3,13 @@
 const db = require(`../db/db`);
 
 const loginRequired = (req, res, next) => {
-  if (!req.user) return res.status(401).json({ status: 'Please log in' });
+  if (!req.user) {
+    if (req.wantsJson) {
+      return res.status(401).json({ status: 'Please log in' });
+    }
+
+    return next({ status : 401, message : `Please log in` });
+  }
   return next();
 }
 

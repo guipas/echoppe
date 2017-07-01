@@ -8,18 +8,17 @@ const cartProductModel = require(`./cart_product.model`);
 const stepFulfillmentModel = require(`./step_fulfillment.model`);
 const stepModel = require(`./step.model`);
 const userModel = require(`./user.model`);
+const addressModel = require(`./address.model`);
 const pluginManager = require(`../../lib/plugin_manager`);
 
-const CART_NEW = 0;
-const CART_PROCESSING = 5;// all steps fulfilled, order accepted but waiting for external validation
-const CART_ORDERED = 10;// order accepted (payment validated...), we can send the products
-const CART_COMPLETED = 15;// product sent
+const status = require(`./cart.status`);
+const stepFulfillmentStatus = require(`./step_fulfillment.status`);
 
 const LABELS = {
-  [CART_NEW] : ``,
-  [CART_PROCESSING] : `Processing (awaiting validation)`,
-  [CART_ORDERED] : `Accepted (products can be sent)`,
-  [CART_COMPLETED] : `Product sent`,
+  [status.CART_NEW] : ``,
+  [status.CART_PROCESSING] : `Processing (awaiting validation)`,
+  [status.CART_ORDERED] : `Accepted (products can be sent)`,
+  [status.CART_COMPLETED] : `Product sent`,
 };
 
 
@@ -33,7 +32,17 @@ const cartModel = sequelize.define(`cart`, {
 
     status : {
       type: Sequelize.INTEGER,
-      defaultValue : CART_NEW,
+      defaultValue : status.CART_NEW,
+    },
+
+    currentStep : {
+      type : Sequelize.STRING,
+      allowNull : true,
+    },
+
+    currentStepHandler : {
+      type : Sequelize.STRING,
+      allowNull : true,
     },
 
     statusLabel : {
@@ -47,13 +56,12 @@ const cartModel = sequelize.define(`cart`, {
     freezeTableName: true,
     underscored: true,
     classMethods : {
-      getAllPosssibleStatus () {
-        return { CART_NEW, CART_PROCESSING, CART_ORDERED, CART_COMPLETED };
+      status () {
+        return status;
       },
-      getNextStatus (currentStatus) {
+      nextStatus (currentStatus) {
         let i = currentStatus;
         let nextStatus = null;
-        // const allStatus = this.getAllPosssibleStatus();
         while (!nextStatus && i++ < 100) {
           if (LABELS[i]) {
             nextStatus = i;
@@ -71,6 +79,7 @@ const cartModel = sequelize.define(`cart`, {
               { model: productModel, as: `products`, through : cartProductModel, include : [{ model : priceModel, as : `prices` }] },
               { model: stepFulfillmentModel, as: `stepFulfillments`, include : [{ model : stepModel, as: `step` }] },
               { model: userModel },
+              { model: addressModel, as: `shipping_address` },
             ],
         })
         .then(cart => cart.get({ plain : true }))
@@ -141,7 +150,7 @@ const cartModel = sequelize.define(`cart`, {
         })
         .then(() => this.fetchOne(cartUid))
       },
-      fulfillStep (cartUid, stepName, handlerName, infos = {}, fulfillmentStatus = 5) {
+      fulfillStep (cartUid, stepName, handlerName, infos = {}, fulfillmentStatus = stepFulfillmentStatus.STEP_COMPLETED) {
         return stepFulfillmentModel.findOne({
           where : { cart_uid : cartUid, step_name : stepName, status : { $gt : -1 } }
         })
@@ -156,7 +165,12 @@ const cartModel = sequelize.define(`cart`, {
               infos,
             })
           }
-          return stepFulfillment;
+
+          return this.update({
+            handler : handlerName,
+            status : fulfillmentStatus,
+            infos,
+          }, { where : { uid : stepFulfillment.uid } })
         })
       },
       updateStatus (cartUid) {
@@ -170,20 +184,22 @@ const cartModel = sequelize.define(`cart`, {
         .then(cart => {
           console.log(`### updateStatus cart retrieved`);
           console.log(cart);
-          if (cart.status < CART_PROCESSING) {
+          const stepFulfillmentStatus = stepFulfillmentModel.status();
+          if (cart.status < status.CART_PROCESSING) {
             const steps = pluginManager.getActiveSteps();
-            const fulfilledSteps = steps.filter(step => cart.stepFulfillments.find(fulfillment => step.name === fulfillment.step.name && fulfillment.status >= 5));
-            const completedSteps = steps.filter(step => cart.stepFulfillments.find(fulfillment => step.name === fulfillment.step.name && fulfillment.status >= 10));
+            // const chosenSteps     = steps.filter(step => cart.stepFulfillments.find(fulfillment => step.name === fulfillment.step.name && fulfillment.status >= stepFulfillmentStatus.STEP_CHOSEN));
+            const processingSteps = steps.filter(step => cart.stepFulfillments.find(fulfillment => step.name === fulfillment.step.name && fulfillment.status >= stepFulfillmentStatus.STEP_PROCESSING));
+            const completedSteps  = steps.filter(step => cart.stepFulfillments.find(fulfillment => step.name === fulfillment.step.name && fulfillment.status >= stepFulfillmentStatus.STEP_COMPLETED));
             if (completedSteps.length === steps.length) {
-              return cart.update({ status : CART_ORDERED });
-            } else if (fulfilledSteps.length === steps.length) {
-              return cart.update({ status : CART_PROCESSING });
+              return cart.update({ status : status.CART_ORDERED });
+            } else if (processingSteps.length === steps.length) {
+              return cart.update({ status : status.CART_PROCESSING });
             }
-          } else if (cart.status >= CART_PROCESSING && cart.status < CART_ORDERED) {
-            const steps = cart.stepFulfillments.filter(f => f.status >= 5).map(f => f.step);// uniq ?
-            const completedSteps = steps.filter(step => cart.stepFulfillments.find(fulfillment => step.name === fulfillment.step.name && fulfillment.status >= 10));
+          } else if (cart.status >= status.CART_PROCESSING && cart.status < status.CART_ORDERED) {
+            const steps = cart.stepFulfillments.filter(f => f.status >= stepFulfillmentStatus.STEP_PROCESSING).map(f => f.step);// uniq ?
+            const completedSteps = steps.filter(step => cart.stepFulfillments.find(fulfillment => step.name === fulfillment.step.name && fulfillment.status >= stepFulfillmentStatus.STEP_COMPLETED));
             if (completedSteps.length === steps.length) {
-              return cart.update({ status : CART_ORDERED });
+              return cart.update({ status : status.CART_ORDERED });
             }
           }
           return cart;
@@ -212,19 +228,21 @@ const cartModel = sequelize.define(`cart`, {
       },
       fetchAll (options = {}) {
         const defaultOptions = {
-          status : [CART_PROCESSING, CART_ORDERED],
+          status : [status.CART_PROCESSING, status.CART_ORDERED],
           itemPerPage : 100,
           page : 1,
           plain : true,
         };
         options = Object.assign({}, defaultOptions, options);
+
+        const where = { status : { $in : options.status } };
+        if (options.userUid) { where.user_uid = options.userUid }
+
         return this.findAll({
           order: `updated_at DESC`,
           offset : (options.page - 1) * options.itemPerPage,
           limit : options.itemPerPage,
-          where : {
-            status : { $in : options.status }
-          },
+          where,
           include : [
             { model : userModel }
           ]
@@ -237,7 +255,11 @@ const cartModel = sequelize.define(`cart`, {
         })
       },
       setShippingAddress (cartUid, addressUid) {
-        return this.update({ shipping_address : addressUid }, { where : { uid : cartUid } })
+        return addressModel.update({ cart_uid : cartUid }, { where : { uid : addressUid } })
+        .then(() => this.fetch(cartUid));
+      },
+      modify (cartUid, values) {
+        return this.update(values, { where : { uid : cartUid } })
         .then(() => this.fetch(cartUid));
       }
 

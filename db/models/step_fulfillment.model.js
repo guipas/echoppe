@@ -2,14 +2,7 @@
 
 const Sequelize = require(`sequelize`);
 const sequelize = require(`../sequelize`);
-
-const STEP_CANCELED = -1;
-const STEP_CHOSEN = 1; // user chose the handler, but he can still decide to ditch this one and ise another one
-// if step status processing or completed,
-// order is locked to this handler, user wont be able to choose another one
-const STEP_PROCESSING = 5;
-const STEP_COMPLETED = 10;
-
+const status = require(`./step_fulfillment.status`);
 
 const stepFulfillment = sequelize.define(`step_fulfillment`, {
 
@@ -21,7 +14,7 @@ const stepFulfillment = sequelize.define(`step_fulfillment`, {
 
     status : {
       type : Sequelize.INTEGER,
-      defaultValue: STEP_CHOSEN,
+      defaultValue: status.STEP_CHOSEN,
     },
 
     handler : {
@@ -39,7 +32,11 @@ const stepFulfillment = sequelize.define(`step_fulfillment`, {
   }, {
     freezeTableName: true,
     underscored: true,
-
+    classMethods : {
+      status () {
+        return status;
+      }
+    }
   }
 );
 

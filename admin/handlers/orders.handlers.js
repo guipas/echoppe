@@ -13,9 +13,9 @@ const handlers = {
         return null;
       }
       console.log(order);
-      const nextStatus = req.shop.models.cart.getNextStatus(order.status);
+      const nextStatus = req.shop.models.cart.nextStatus(order.status);
       console.log(nextStatus);
-      const allStatus = req.shop.models.cart.getAllPosssibleStatus();
+      const allStatus = req.shop.models.cart.status();
       let nextLabel = null;
       if (nextStatus === allStatus.CART_ORDERED) { nextLabel = 'Manualy validate order' }
       else if (nextStatus === allStatus.CART_COMPLETED) { nextLabel = `Complete order (mark as sent)` }

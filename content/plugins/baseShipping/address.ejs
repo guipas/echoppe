@@ -4,48 +4,52 @@
     <div class="col-12 col-md-8 col-xl-6">
       <h4>Shipping address </h4>
       <p>
-        Fill your shipping address <small><a href="<%= linkTo('auth', 'login'); %>">or login if you have an account &rarr;</a></small>
+        Fill your shipping address
       </p>
       <hr>
       <form action="" method ="POST">
         <input type="hidden" name="_csrf" value="<%= csrf %>">
         <input type="hidden" name="plugin_action" value="validate_address">
         <div class="form-group">
-          <label for="">Email</label>
-          <input type="email" name="email" class="form-control">
+          <label for="">Email*</label>
+          <input type="email" name="address[email]" class="form-control" value="<%= address ? address.email : '' %>" required>
         </div>
         <div class="form-group">
-          <label for="">Address name</label>
-          <input type="text" name="address[name]" class="form-control">
-        </div>
-        <div class="form-group">
-          <label for="">Address <small>(line 1)</small></label>
-          <input type="text" name="address[line1]" class="form-control">
+          <label for="">Address <small>(line 1)</small>*</label>
+          <input type="text" name="address[line1]" class="form-control" value="<%= address ? address.line1 : '' %>" required>
         </div>
         <div class="form-group">
           <label for="">Address <small>(line 2)</small></label>
-          <input type="text" name="address[line2]" class="form-control">
+          <input type="text" name="address[line2]" class="form-control" value="<%= address ? address.line2 : '' %>">
         </div>
         <div class="form-group">
           <label for="">State</label>
-          <input type="text" name="address[state]" class="form-control">
+          <input type="text" name="address[state]" class="form-control" value="<%= address ? address.state : '' %>">
         </div>
         <div class="form-group">
-          <label for="">City</label>
-          <input type="text" name="address[city]" class="form-control">
+          <label for="">City*</label>
+          <input type="text" name="address[city]" class="form-control" value="<%= address ? address.city : '' %>" required>
         </div>
         <div class="form-group">
           <label for="">Zip code</label>
-          <input type="text" name="address[zipcode]" class="form-control">
+          <input type="text" name="address[zipcode]" class="form-control" value="<%= address ? address.zipcode : '' %>">
         </div>
         <div class="form-group">
-          <label for="">Country</label>
-          <input type="text" name="address[country]" class="form-control">
+          <label for="">Country*</label>
+          <input type="text" name="address[country]" class="form-control" value="<%= address ? address.country : '' %>" required>
         </div>
         <div class="text-right">
           <input type="submit" value="Save" class="btn btn-outline-primary">
         </div>
       </form>
+      <div class="text-left">
+      <% if (canGoBack) { %>
+        <form action="<%= previousLink %>" method="POST">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <input type="submit" value="Back" class="btn btn-outline-secondary">
+        </form>
+      <% } %>
+      </div>
     </div>
   </div>
 </div>

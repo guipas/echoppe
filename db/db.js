@@ -30,6 +30,8 @@ const taxonomyModel = require(`./models/taxonomy.model`);
 const uploadProductModel = require(`./models/upload_product.model`);
 const addressModel = require(`./models/address.model`);
 
+const cartStatus = require(`./models/cart.status`);
+
 require(`./relations`);
 
 module.exports = {
@@ -46,4 +48,7 @@ module.exports = {
     upload_product : uploadProductModel,
     address : addressModel,
   },
+  status : {
+    cart : cartStatus,
+  }
 };

@@ -93,7 +93,12 @@ router.post(`/login`, helpers.loginRedirect, (req, res, next) => {
 
 router.get('/logout', helpers.loginRequired, (req, res, next) => {
   req.logout();
-  handleResponse(res, 200, 'success');
+  if (req.wantsJson) {
+    handleResponse(res, 200, 'success');
+    return;
+  }
+
+  res.redirect(`/`);
 });
 
 router.get('/user', helpers.loginRequired, (req, res, next)  => {

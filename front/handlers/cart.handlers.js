@@ -25,7 +25,7 @@ const handlers = {
 
       if (req.wantsJson) { res.json(cart); }
       // else res.render(`cart`, { cart });
-      else res.redirect(res.app.locals.linkTo(`/cart`));
+      else res.redirect(res.locals.linkTo(`/cart`));
 
       return null;
     })

@@ -31,8 +31,8 @@ const app = express();
 
 // set locals :
 app.locals.config = config;
-app.locals.linkTo = (...routes) => `${config.site.url}${path.join(`/`, ...routes)}`;
-app.locals.themePublicUrl = (...routes) =>  app.locals.linkTo(`themes`, config.theme, `public`, ...routes);
+// app.locals.linkTo = (...routes) => `${config.site.url}${path.join(`/`, ...routes)}`;
+// app.locals.themePublicUrl = (...routes) =>  app.locals.linkTo(`themes`, config.theme, `public`, ...routes);
 
 // view engine setup
 app.set(`views`, [
@@ -100,11 +100,15 @@ app.use((err, req, res, next) => {
   // render the error page
   res.status(err.status || 500);
 
-  if (req.wantsJson) {
-    return res.json({ message : res.locals.message, error : res.locals.error })
-  }
+  echoppeMiddleware(req, res, () => {
+    if (req.wantsJson) {
+      return res.json({ message : res.locals.message, error : res.locals.error })
+    }
 
-  return res.render(`error`);
+    return res.render(`error`);
+
+  })
+
 });
 
 app.init = () => {

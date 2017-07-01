@@ -12,6 +12,11 @@ const addressModel = sequelize.define(`address`, {
       defaultValue: Sequelize.UUIDV4,
     },
 
+    email : { // for order without an account
+      type : Sequelize.STRING,
+      allowNull : true,
+    },
+
     name : {
       type : Sequelize.STRING,
       allowNull : true,
@@ -60,18 +65,33 @@ const addressModel = sequelize.define(`address`, {
       make (address, user) {
         const userUid = typeof user === `object` ? user.uid : user;
         return this.create(Object.assign({}, address, { user_uid : userUid }))
+        .then(address => this.fetchOne(address.uid))
       },
       fetchForUser (user) {
-        return this.find({ where : { user_uid : user.uid } })
-        .then(addresses => addresses.map(address => address.get({ plain : true })))
+        return this.findAll({ where : { user_uid : typeof user === `object` ? user.uid : user } })
+        .then(addresses => { return addresses ? addresses.map(address => address.get({ plain : true })) : [] })
       },
-      fetchOne (uid) {
-        return this.find({ where : { uid } })
+      fetchForCart (cartUid) {
+        return this.findOne({ where : { cart_uid : cartUid } })
         .then(address => { return address ? address.get({ plain : true }) : null })
       },
-      modify (address) {
-        return this.update(address, { where : { uid : address.uid } })
-        .then(() => this.fetch(address.uid));
+      fetch (...args) {
+        // return this.fetchOne(uid);
+        return Reflect.apply(this.fetchOne, this, args);
+      },
+      fetchOne (uid, options = {}) {
+        const where = { uid };
+        if (options.userUid) { where.user_uid = options.userUid };
+        if (options.user) { where.user_uid = typeof options.user === `object` ? options.user.uid : options.user }
+
+        return this.find({ where })
+        .then(address => { return address ? address.get({ plain : true }) : null })
+      },
+      modify (addressUid, values) {
+        console.log(values);
+        Reflect.deleteProperty(values, `uid`);
+        return this.update(values, { where : { uid : addressUid } })
+        .then(() => this.fetch(addressUid));
       }
     }
   }
