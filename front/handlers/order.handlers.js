@@ -123,7 +123,8 @@ const handlers = {
         }
         res.locals.previousLink = res.locals.linkTo(`order`, `previous`);
         res.locals.nextLink = res.locals.linkTo(`order`, `next`);
-        console.log(req.shop.current.cart);
+        res.locals.theme.layout = res.locals.theme.layouts.NAKED; // simple layout without menu
+
         return new Promise((resolve, reject) => {
           const result = currentStepHanlder.middleware(req, res, e => {
             // when plugin's middleware has succeded, it calls this callback

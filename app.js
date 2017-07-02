@@ -81,14 +81,14 @@ app.use(`/auth`, firstTimeMiddleware, require(`./auth/routes`));
 app.use(`/`, require(`./front/front.routes`)(config));
 
 // catch 404 and forward to error handler
-app.use((req, res, next) => {
+const notFoundHandler = (req, res, next) => {
   const err = new Error(`Not Found`);
   err.status = 404;
   next(err);
-});
+};
 
 // error handler
-app.use((err, req, res, next) => {
+const errorHandler = (err, req, res, next) => {
 
   // set locals, only providing error in development
   res.locals.message = err.message;
@@ -109,7 +109,7 @@ app.use((err, req, res, next) => {
 
   })
 
-});
+};
 
 app.init = () => {
   // return db.sequelize.sync({ force : true })
@@ -123,7 +123,11 @@ app.init = () => {
     return null;
   })
   .then(() => {
-    pluginManager.init(db);
+    return pluginManager.init(db, app);
+  })
+  .then(() => {
+    app.use(notFoundHandler);
+    app.use(errorHandler);
   })
 }
 

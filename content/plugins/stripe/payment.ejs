@@ -10,20 +10,28 @@
     <% } %>
     <div class="col-12 text-center">
       <form action="<%= linkTo('order') %>" method="POST">
-      <input type="hidden" name="_csrf" value="<%= csrf %>">
-      <input type="hidden" name="plugin_action" value="validate_payment">
-      <script
-        src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-        data-key="<%- keyPublishable %>"
-        data-amount="100"
-        data-name="Demo Site"
-        data-description="Widget"
-        data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
-        data-locale="auto"
-        data-zip-code="true"
-        data-currency="eur">
-      </script>
-    </form>
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <input type="hidden" name="plugin_action" value="validate_payment">
+        <script
+          src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+          data-key="<%- keyPublishable %>"
+          data-amount="100"
+          data-name="Demo Site"
+          data-description="Widget"
+          data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+          data-locale="auto"
+          data-zip-code="true"
+          data-currency="eur">
+        </script>
+      </form>
+    </div>
+    <div class="col-12 text-center p-4">
+      <% if (canGoBack) { %>
+        <form action="<%= previousLink %>" method="POST">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <input type="submit" value="&larr; Back" class="btn btn-outline-secondary">
+        </form>
+      <% } %>
     </div>
   </div>
 </div>
