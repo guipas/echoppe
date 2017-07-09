@@ -20,13 +20,18 @@
             <%- plugin.description %>
         </div>
         <div class="plugin-tools">
-          <div class="plugin-tool plugin-tool-activate">
+          <div class="plugin-tool plugin-tool-activate d-inline-block">
             <form method="POST" action="/admin/plugins/<%- plugin.name %>">
               <input type="hidden" value="<%= csrf %>" name="_csrf">
               <span class="<%= plugin.isActive ? 'text-success' : 'text-danger' %>"><%= plugin.isActive ? 'Enabled' : 'Disabled' %></span>
-               -
+              -
               <input type="submit" value="<%= plugin.isActive ? 'Disable' : 'Enable' %>" style="background:none;border:none;text-decoration:underline;cursor:pointer;">
             </form>
+          </div>
+          <div class="plugin-tool plugin-tool-options d-inline">
+            <% if (plugin.isActive && plugin.settings && Object.keys(plugin.settings).length > 0) { %>
+              - <a href="<%= urlToAdmin('plugins', plugin.name, 'settings') %>">Settings &rarr;</a>
+            <% } %>
           </div>
         </div>
 

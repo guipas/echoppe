@@ -31,6 +31,7 @@ const uploadProductModel = require(`./models/upload_product.model`);
 const addressModel = require(`./models/address.model`);
 
 const cartStatus = require(`./models/cart.status`);
+const stepFulfillmentStatus = require(`./models/step_fulfillment.status`);
 
 require(`./relations`);
 
@@ -50,5 +51,6 @@ module.exports = {
   },
   status : {
     cart : cartStatus,
+    stepFulfillment : stepFulfillmentStatus,
   }
 };

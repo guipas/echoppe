@@ -2,19 +2,18 @@
 
 const path = require(`path`);
 
-// const keyPublishable = process.env.PUBLISHABLE_KEY;
-const keyPublishable = `pk_test_3dt3dTXVME1yLzZQPctBtV1S`;
-// const keySecret = process.env.SECRET_KEY;
-const keySecret = `sk_test_0poc1Q6Xa4z8svfECCNOiyP2`;
-
-const stripe = require(`stripe`)(keySecret);
+let stripe = null;
 
 const plugin = {
   name : `stripe`,
   title : `Stripe payment integration (unofficial)`,
   description : `Enable payment with stripe`,
-  options : {},
-  init () {
+  settings : {
+    keyPublishable : {},
+    keySecret : { label: `Your stripe secret key`, tip: `You can find this information in your stripe account`, value : '' },
+  },
+  ready (settings) {
+    stripe = require(`stripe`)(settings.keySecret.value);// eslint-disable-line
   },
   steps : [
     { name : `order:payment`, sort : 1000, activatedByDefault : true },
@@ -27,14 +26,17 @@ const plugin = {
       activatedByDefault : true,
       label : `Pay width debit/credit card (stripe)`,
       middleware : (req, res, next) => {
-        console.log(`### Stripe`);
-        if (req.method === `POST` && req.body.plugin_action === `validate_payment`) {
-          let amount = 100;
+        // console.log(`### Stripe`);
 
-          return stripe.customers.create({
+        if (req.method === `POST` && req.body.plugin_action === `validate_payment`) {
+          let amount = null;
+
+          return req.shop.models.cart.getTotal(req.shop.current.cart.uid, true)
+          .then(total => amount = total)
+          .then(() => stripe.customers.create({
             email: req.body.stripeEmail,
             source: req.body.stripeToken
-          })
+          }))
           .then(customer => stripe.charges.create({
               amount,
               description: "Sample Charge",
@@ -42,25 +44,32 @@ const plugin = {
                 customer: customer.id
           }))
           .then(charge => {
-            console.log(`### charge`);
-            console.log(charge);
-            return req.shop.models.cart.fulfillStep(req.shop.current.cart.uid, req.shop.current.step.name, req.shop.current.stepHandler.name)
+            // console.log(`### charge`);
+            // console.log(charge);
+            return req.shop.models.cart.fulfillStep(req.shop.current.cart.uid, req.shop.current.step.name, req.shop.current.stepHandler.name, { charge })
           })
           .then(() => {
             next();
             return;
           })
           .catch(e => {
-            res.status(e.statusCode).render(path.join(__dirname, `payment.ejs`), { error : e.message, keyPublishable });
+            res.status(e.statusCode).render(path.join(__dirname, `payment.ejs`), { error : e.message, keyPublishable: plugin.settings.keyPublishable.value });
             return;
           })
         }
-        console.log(req.shop.current.cart);
-        res.render(path.join(__dirname, `payment.ejs`), { keyPublishable });
+
+        // console.log(req.shop.current.cart);
+        return req.shop.models.cart.getTotal(req.shop.current.cart.uid, true)
+        .then(total => {
+          res.render(path.join(__dirname, `payment.ejs`), {
+            keyPublishable: plugin.settings.keyPublishable.value,
+            total,
+          });
+          return null;
+        })
       }
     }
   ],
 }
-
 
 module.exports = plugin;

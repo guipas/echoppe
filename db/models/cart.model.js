@@ -16,6 +16,7 @@ const stepFulfillmentStatus = require(`./step_fulfillment.status`);
 
 const LABELS = {
   [status.CART_NEW] : ``,
+  [status.CART_LOCKED] : ``,
   [status.CART_PROCESSING] : `Processing (awaiting validation)`,
   [status.CART_ORDERED] : `Accepted (products can be sent)`,
   [status.CART_COMPLETED] : `Product sent`,
@@ -84,6 +85,33 @@ const cartModel = sequelize.define(`cart`, {
         })
         .then(cart => cart.get({ plain : true }))
       },
+      getTotal (uid, options) {
+        options = Object.assign({
+          cents: true, // mutliply total * 100 and returns an int (for some payment platforms)
+          fees: true, // include fees in total
+        }, options);
+
+        return this.fetch(uid)
+        .then(cart => {
+          if (!cart) return Promise.reject();
+
+          console.log(cart);
+          let total = cart.products.reduce((total, product) => total + product.price.value * product.cart_product.quantity, 0.0);
+
+          if (options.fees) {
+            cart.stepFulfillments.forEach(fulfillment => {
+              total += fulfillment.fee;
+            })
+          }
+
+          if (options.cents) {
+            total *= 100;
+            total = Math.round(total);
+          }
+
+          return total;
+        })
+      },
       _addProductOrUpQuantity (cartUid, productUid) {
         return cartProductModel.findOne({
           where : { 'cart_uid' : cartUid, 'product_uid' : productUid }
@@ -129,6 +157,7 @@ const cartModel = sequelize.define(`cart`, {
           })
           .then(() => cart);
         })
+        .then(cart => this.resetOrderProcess(cart.uid).then(() => cart))
         .then(cart => this.fetchOne(cart.uid))
       },
       removeProduct (cartUid, productUid) {
@@ -138,6 +167,7 @@ const cartModel = sequelize.define(`cart`, {
             'cart_uid' : cartUid,
           }
         })
+        .then(() => this.resetOrderProcess(cartUid))
         .then(() => this.fetchOne(cartUid))
       },
       decreaseQuantity (cartUid, productUid) {
@@ -148,6 +178,7 @@ const cartModel = sequelize.define(`cart`, {
           }
           return this.removeProduct(cartUid, productUid);
         })
+        .then(() => this.resetOrderProcess(cartUid))
         .then(() => this.fetchOne(cartUid))
       },
       fulfillStep (cartUid, stepName, handlerName, infos = {}, fulfillmentStatus = stepFulfillmentStatus.STEP_COMPLETED) {
@@ -166,7 +197,7 @@ const cartModel = sequelize.define(`cart`, {
             })
           }
 
-          return this.update({
+          return stepFulfillmentModel.update({
             handler : handlerName,
             status : fulfillmentStatus,
             infos,
@@ -261,7 +292,19 @@ const cartModel = sequelize.define(`cart`, {
       modify (cartUid, values) {
         return this.update(values, { where : { uid : cartUid } })
         .then(() => this.fetch(cartUid));
-      }
+      },
+      resetOrderProcess (uid) {
+        return this.update({
+          currentStepHandler: null,
+          currentStep: null,
+        }, { where: { uid } })
+        .then(() => stepFulfillmentModel.update({
+          status: stepFulfillmentStatus.STEP_CHOSEN
+        }, { where: {
+          cart_uid: uid,
+          status: { $gt : stepFulfillmentStatus.STEP_CHOSEN },
+        } }))
+      },
 
     }
   }

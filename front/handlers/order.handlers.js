@@ -16,11 +16,11 @@ const getCurrents = req => {
     let currentStep = steps.find(step => step.name === cart.currentStep)
     let currentStepFulfillment = null;
     if (currentStep) {
-      currentStepFulfillment = cart.stepFulfillments.find(f => f.step.name === currentStep.name && f.status >= 0);
+      currentStepFulfillment = cart.stepFulfillments.find(f => f.step.name === currentStep.name && f.status >= req.shop.status.stepFulfillment.STEP_CHOSEN);
     } else {
       // current step is the next step in the order process that is not fulfilled yet
       currentStep = steps.find(step => {
-        const fulfillment = cart.stepFulfillments.find(f => f.step.name === step.name && f.status >= 0);
+        const fulfillment = cart.stepFulfillments.find(f => f.step.name === step.name && f.status >= req.shop.status.stepFulfillment.STEP_PROCESSING);
         return !fulfillment;
       })
     }
@@ -31,7 +31,7 @@ const getCurrents = req => {
     // loading current handler...
     let currentStepHanlder = null;
     if (currentStep && cart.currentStepHandler) {
-      currentStepHanlder = currentStep.handlers.find(handler => handler.name === cart.currentStepHandler);
+      currentStepHanlder = currentStep.activatedHandlers.find(handler => handler.name === cart.currentStepHandler);
     }
 
 
@@ -50,7 +50,7 @@ const handlers = {
   previousStep (req, res, next) {
     return getCurrents(req)
     .then(({ steps, cart, currentStep, currentStepIndex, currentStepHanlder }) => {
-      if (currentStepHanlder && currentStep.handlers.length > 1) {
+      if (currentStepHanlder && currentStep.activatedHandlers.length > 1) {
         return req.shop.models.cart.modify(cart.uid, { currentStepHandler : null })
         .then(() => {
           res.redirect(`/order`);
@@ -80,7 +80,7 @@ const handlers = {
       // saving chosen handler...
       return req.shop.models.cart.modify(cart.uid, {
         currentStep : currentStep.name,
-        currentStepHandler : currentStep.handlers.find(handler => handler.name === choice).name,
+        currentStepHandler : currentStep.activatedHandlers.find(handler => handler.name === choice).name,
       })
       .then(() => {
         res.redirect(`/order`);
@@ -91,6 +91,11 @@ const handlers = {
   order (req, res, next) {
     return getCurrents(req)
     .then(({ cart, currentStep, steps, currentStepHanlder, currentStepIndex }) => {
+
+      if (steps.length === 0) {
+        res.render(`order/error`);
+        return null;
+      }
 
       // no current step, maybe the order is completed ? (or there is something wrong)
       if (!currentStep) {
@@ -114,6 +119,7 @@ const handlers = {
         // an handler is currently holding control of order process
         req.shop.current.step = currentStep;
         req.shop.current.stepHandler = currentStepHanlder;
+        req.shop.current.plugin = currentStepHanlder.plugin;
         res.locals.canGoBack = currentStepIndex >= 0;
         res.locals.canGoForward = false;
         if (currentStepIndex < steps.length - 1) {
@@ -152,17 +158,17 @@ const handlers = {
 
       // no handler chosen for current step
       console.log(`### printing choice for current step`);
-      if (currentStep.handlers.length === 0) {
+      if (currentStep.activatedHandlers.length === 0) {
         // error
         next({ status : 500, message : `Error in order configuration, no handler for this step` });
 
         return null;
-      } else if (currentStep.handlers.length === 1) {
+      } else if (currentStep.activatedHandlers.length === 1) {
         console.log(`just one handlder`);
         // just one handler, auto select the only one there is...
         return req.shop.models.cart.modify(cart.uid, {
           currentStep : currentStep.name,
-          currentStepHandler : currentStep.handlers[0].name,
+          currentStepHandler : currentStep.activatedHandlers[0].name,
         })
         .then(() => {
           res.redirect(`/order`);
@@ -171,7 +177,7 @@ const handlers = {
       }
       res.render(`order/choose`, {
         csrf : req.csrfToken(),
-        handlers : currentStep.handlers,
+        handlers : currentStep.activatedHandlers,
         currentStepName : currentStep.name,
       });
 

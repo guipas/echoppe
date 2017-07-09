@@ -3,10 +3,10 @@
 const path = require(`path`);
 
 const plugin = {
-  name : `hello`,
-  title : `Hello Plugin`,
-  description : `the most basic example of a plugin`,
-  options : {},
+  name : `baseshipping`,
+  title : `Addresses & Shpping`,
+  description : `Basic Addresses and Shipping Plugin`,
+  settings : {},
   init () {
   },
   hooks : [

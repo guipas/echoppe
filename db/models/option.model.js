@@ -24,7 +24,7 @@ const optionModel = sequelize.define(`option`, {
     },
 
     value : {
-      type : Sequelize.STRING,
+      type : Sequelize.TEXT,
       defaultValue : ``,
     }
 
@@ -65,10 +65,9 @@ const optionModel = sequelize.define(`option`, {
           return options;
         })
       },
-      setValue (name, value, type = null, group = null) {
+      setValue (name, value, type = null) {
         const option = { name, value };
         if (type) option.type = type;
-        if (group) option.group = group;
         return this.setOption(option);
       },
       setOption (option) {

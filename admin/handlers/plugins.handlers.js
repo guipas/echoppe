@@ -4,44 +4,40 @@ const db = require(`../../db/db`);
 
 const handlers = {
   list (req, res) {
-    return db.models.option.fetchValue(`core:activated_plugins`)
-    .then(activatedPlugins => {
-      const plugins = req.shop.pluginManager.plugins.map(plugin => {
-        let isActive = false;
-        if (activatedPlugins) {
-          const pluginInfo = activatedPlugins.find(p => p.name === plugin.name)
-          if (pluginInfo && pluginInfo.activated) isActive = true;
-        }
-        return {
-          name : plugin.name,
-          title : plugin.title,
-          label : plugin.label,
-          description : plugin.description,
-          isActive,
-        }
-      });
-      if (req.wantsJson) {
-        return res.send(plugins);
-      }
-      return res.render(`plugins/list`, { plugins, csrf : req.csrfToken() });
+    const plugins = req.shop.pluginManager.plugins;
+    if (req.wantsJson) {
+      return res.send(plugins);
+    }
+    return res.render(`plugins/list`, { plugins, csrf : req.csrfToken() });
 
-    })
   },
   triggerActivation (req, res) {
     const name = req.params.plugin;
-    return db.models.option.fetchValue(`core:activated_plugins`)
-    .then(activatedPlugins => {
-      if (!activatedPlugins) activatedPlugins = [];
-
-      const pluginInfo = activatedPlugins.find(p => p.name === name);
-      if (pluginInfo) { pluginInfo.activated = !pluginInfo.activated }
-      else activatedPlugins.push({ name, activated : true })
-
-      return db.models.option.setValue(`core:activated_plugins`, activatedPlugins);
-    })
+    return req.shop.pluginManager.togglePluginActivation(name)
     .then(() => {
       res.redirect(res.app.locals.linkTo(`/plugins`));
       return null;
+    })
+  },
+  settings (req, res, next) {
+    const plugin = req.shop.pluginManager.getByName(req.params.plugin);
+    if (!plugin) return next();
+
+    if (req.wantsJson) {
+      return res.json(plugin.settings);
+    }
+
+    console.log(plugin.settings);
+    return res.render(`plugins/settings`, { plugin });
+  },
+  saveSettings (req, res, next) {
+    return req.shop.pluginManager.savePluginSettings(req.params.plugin, req.body.settings)
+    .then(() => {
+      if (req.wantsJson) {
+        res.json({ message : `ok` });
+        return null;
+      }
+      res.redirect(res.locals.urlToAdmin(`plugins`, req.params.plugin, `settings`));
     })
   },
 }

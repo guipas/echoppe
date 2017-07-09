@@ -27,7 +27,12 @@ const stepFulfillment = sequelize.define(`step_fulfillment`, {
       defaultValue : `{}`,
       get () { return JSON.parse(this.getDataValue(`infos`)); },
       set (val) { this.setDataValue(`infos`, JSON.stringify(val)); }
-    }
+    },
+
+    fee : {
+      type : Sequelize.FLOAT,
+      defaultValue: 0,
+    },
 
   }, {
     freezeTableName: true,

@@ -205,8 +205,7 @@ module.exports = {
         "prefer-template": "off",
         "quote-props": "off",
         "quotes": [
-            "error",
-            "backtick"
+            "off",
         ],
         "radix": "error",
         "require-jsdoc": "off",

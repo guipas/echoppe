@@ -13,11 +13,6 @@ const priceModel = sequelize.define(`price`, {
       defaultValue: Sequelize.UUIDV4,
     },
 
-    // product : {
-    //   model : `product`,
-    //   required : false,
-    // },
-
     value : {
       type : Sequelize.FLOAT,
       defaultValue: 0,

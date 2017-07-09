@@ -20,8 +20,6 @@ admin.locals.config = require(`../config`);
 admin.locals.linkTo = (...adminRoute) => `${admin.locals.config.site.url}/${path.join(`admin`, ...adminRoute)}`;
 admin.locals.linkToFront = (...routes) => `${admin.locals.config.site.url}${routes ? path.join(`/`, ...routes) : ``}`;
 
-
-
 admin.set(`views`, path.join(__dirname, `views`));
 admin.set(`view engine`, `ejs`);
 
@@ -43,6 +41,8 @@ admin.get(`/images`, mediaHandlers.list);
 
 admin.get(`/plugins`, pluginsHandlers.list);
 admin.post(`/plugins/:plugin`, pluginsHandlers.triggerActivation);
+admin.get(`/plugins/:plugin/settings`, pluginsHandlers.settings);
+admin.post(`/plugins/:plugin/settings`, pluginsHandlers.saveSettings);
 
 admin.get(`/steps`, stepsHandlers.list);
 admin.post(`/steps/:step`, stepsHandlers.triggerActivation);
