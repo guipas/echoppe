@@ -2,13 +2,18 @@
 <div class="card">
   <div class="card-block">
     <h4 class="card-title"><%= plugin.name %> settings</h4>
+    <%- include(`../partials/alerts`, { alerts }); %>
     <hr>
     <form action="" method="POST">
       <input type="hidden" name="_csrf" value="<%- csrf %>">
       <% Object.keys(plugin.settings).forEach(settingName => { const setting = plugin.settings[settingName]; %>
         <div class="form-group">
           <label for="<%= settingName %>"><%= setting.label ? setting.label : settingName %></label>
-          <input type="text" name="settings[<%= settingName %>][value]" value="<%- setting.value ? setting.value : '' %>" class="form-control">
+          <% if (setting.type && setting.type === `text`) { %>
+            <textarea name="settings[<%= settingName %>][value]" id="" rows="10" class="form-control"><%- setting.value ? setting.value : '' %></textarea>
+          <% } else { %>
+            <input type="text" name="settings[<%= settingName %>][value]" value="<%- setting.value ? setting.value : '' %>" class="form-control">
+          <% } %>
           <% if (setting.tip) { %><small class="form-text"><%- setting.tip %></small><% } %>
         </div>
       <% }) %>

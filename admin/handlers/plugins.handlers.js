@@ -27,8 +27,19 @@ const handlers = {
       return res.json(plugin.settings);
     }
 
-    console.log(plugin.settings);
-    return res.render(`plugins/settings`, { plugin });
+    const settingsArray = Object.keys(plugin.settings).map(key => {
+      const setting = plugin.settings[key];
+      setting.name = key;
+      return setting;
+    })
+    .sort((s1, s2) => {
+      const a1 = s1.sort || 10000;
+      const a2 = s2.sort || 10000;
+      return a1 - a2;
+    })
+    console.log(settingsArray);
+    const alerts = plugin.alerts && plugin.alerts.settingsPage ? [].concat(plugin.alerts.settingsPage()) : [];
+    return res.render(`plugins/settings`, { plugin, alerts });
   },
   saveSettings (req, res, next) {
     return req.shop.pluginManager.savePluginSettings(req.params.plugin, req.body.settings)

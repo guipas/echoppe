@@ -29,6 +29,7 @@ const stepModel = require(`./models/step.model`);
 const taxonomyModel = require(`./models/taxonomy.model`);
 const uploadProductModel = require(`./models/upload_product.model`);
 const addressModel = require(`./models/address.model`);
+const simpleDatastoreModel = require(`./models/simple_datastore.model`);
 
 const cartStatus = require(`./models/cart.status`);
 const stepFulfillmentStatus = require(`./models/step_fulfillment.status`);
@@ -48,6 +49,7 @@ module.exports = {
     taxonomy : taxonomyModel,
     upload_product : uploadProductModel,
     address : addressModel,
+    datastore: simpleDatastoreModel,
   },
   status : {
     cart : cartStatus,

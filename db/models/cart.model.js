@@ -181,7 +181,7 @@ const cartModel = sequelize.define(`cart`, {
         .then(() => this.resetOrderProcess(cartUid))
         .then(() => this.fetchOne(cartUid))
       },
-      fulfillStep (cartUid, stepName, handlerName, infos = {}, fulfillmentStatus = stepFulfillmentStatus.STEP_COMPLETED) {
+      fulfillStep (cartUid, stepName, handlerName, infos = {}, fulfillmentStatus = stepFulfillmentStatus.STEP_COMPLETED, fee = 0) {
         return stepFulfillmentModel.findOne({
           where : { cart_uid : cartUid, step_name : stepName, status : { $gt : -1 } }
         })
@@ -194,6 +194,7 @@ const cartModel = sequelize.define(`cart`, {
               handler : handlerName,
               status : fulfillmentStatus,
               infos,
+              fee,
             })
           }
 
@@ -201,6 +202,7 @@ const cartModel = sequelize.define(`cart`, {
             handler : handlerName,
             status : fulfillmentStatus,
             infos,
+            fee,
           }, { where : { uid : stepFulfillment.uid } })
         })
       },

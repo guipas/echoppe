@@ -12,8 +12,19 @@ const plugin = {
     keyPublishable : {},
     keySecret : { label: `Your stripe secret key`, tip: `You can find this information in your stripe account`, value : '' },
   },
-  ready (settings) {
+  alerts : {
+    settingsPage () {
+      if (!plugin.settings.keyPublishable.value || !plugin.settings.keySecret.value) {
+        return { type: `danger`, text: `keyPublishable and/or keySecret not configured` };
+      }
+
+      return [];
+    }
+  },
+  ready ({ settings, store }) {
     stripe = require(`stripe`)(settings.keySecret.value);// eslint-disable-line
+    store.setValue(`test`, `ok`);
+
   },
   steps : [
     { name : `order:payment`, sort : 1000, activatedByDefault : true },
@@ -27,6 +38,10 @@ const plugin = {
       label : `Pay width debit/credit card (stripe)`,
       middleware : (req, res, next) => {
         // console.log(`### Stripe`);
+        if (!plugin.settings.keyPublishable.value && !plugin.settings.keySecret) {
+          console.log(`keyPublishable and/or keySecret not configured`);
+          return next(new Error());
+        }
 
         if (req.method === `POST` && req.body.plugin_action === `validate_payment`) {
           let amount = null;
