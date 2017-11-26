@@ -1,5 +1,0 @@
---reporter spec
---watch
---growl
---slow 200
-test/**/test.*.js

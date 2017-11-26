@@ -1,2 +1,5 @@
-/content*
-/node_modules*
+./bower_components/
+./node_modules/
+**/.git/**
+**/.tmp/**
+*.less
