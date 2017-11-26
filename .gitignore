@@ -11,7 +11,7 @@ config/config.js
 
 *~
 *#
-.DS_STORE
+.DS_Store
 .netbeans
 nbproject
 .idea
