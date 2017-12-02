@@ -5,6 +5,12 @@ module.exports = {
         "es6": true,
         "node": true
     },
+    "parserOptions": {
+        "ecmaVersion": 8,
+        "ecmaFeatures": {
+          "experimentalObjectRestSpread": true,
+        }
+    },
     "extends": "eslint:recommended",
     "rules": {
         "no-console" : "off",
@@ -91,7 +97,7 @@ module.exports = {
         "max-lines": "error",
         "max-nested-callbacks": "error",
         "max-params": ["error", 5],
-        "max-statements": ["error", 10, {
+        "max-statements": ["error", 25, {
           "ignoreTopLevelFunctions": true
         }],
         "max-statements-per-line": "off",
@@ -140,7 +146,7 @@ module.exports = {
         "no-multi-spaces": "off",
         "no-multi-str": "error",
         "no-multiple-empty-lines": "error",
-        "no-negated-condition": "error",
+        "no-negated-condition": "warning",
         "no-nested-ternary": "error",
         "no-new": "error",
         "no-new-func": "error",

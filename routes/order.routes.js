@@ -1,3 +1,5 @@
+'use strict';
+
 const _ = require('lodash');
 const isAdmin = require('../lib/isAdmin.auth.middleware');
 const safeHandle = require(`../lib/safeHandle`);
@@ -18,6 +20,19 @@ const canOrder = safeHandle(async (req, res, next) => {
 
 
 module.exports = router => {
+
+  router.get('/orders', isAdmin, safeHandle(async (req, res, next) => {
+    const orders = await models.cart.orders.list();
+
+    return res.json(orders);
+  }));
+
+
+  router.get('/orders/:order', isAdmin, safeHandle(async (req, res, next) => {
+    const order = await models.cart.orders.fetch(req.params.order);
+
+    return res.json(order);
+  }));
 
   router.post('/order/choice', canOrder, safeHandle(async (req, res, next) => {
     const handlerName = req.body.choice;

@@ -34,7 +34,6 @@ module.exports = () => {
 
   router.get('/products/:product', safeHandle(async (req, res, next) => {
     const product = await models.product.fetch(req.params.product);
-    console.log(product);
     if (req.wantsJson) {
       res.json(product).end();
       return;
@@ -43,8 +42,7 @@ module.exports = () => {
     res.render('product', { product, csrf : req.csrfToken() });
   }));
 
-  router.post('/products', isAdmin, upload.array(`images`), safeHandle(async function (req, res) {
-    console.log('adding product...');
+  router.post('/products', isAdmin, safeHandle(async function (req, res) {
     const prod = await models.product.add({
       name : req.body.name,
       quantity : req.body.quantity,
@@ -58,7 +56,7 @@ module.exports = () => {
   router.put('/products/:product', isAdmin, safeHandle(async function (req, res) {
     const prod = await models.product.modify({
       ...req.body,
-      id : req.params.product,
+      _id : req.params.product,
     });
 
     res.end();
@@ -85,7 +83,6 @@ module.exports = () => {
 
   router.get('/cart', safeHandle(async (req, res) => {
     const cart = req.shop.cartManager.cart;
-    console.log('### cart : ', cart);
 
     if (req.wantsJson) {
       res.json(cart).end;
