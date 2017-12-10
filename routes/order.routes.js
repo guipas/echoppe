@@ -12,7 +12,7 @@ const log       = require('../lib/debugLog').log;
 
 const canOrder = safeHandle(async (req, res, next) => {
   if (!await cartManager.canOrder()) {
-    return res.redirect('/cart').end();
+    return res.redirect('/cart');
   }
 
   return next();
@@ -48,7 +48,7 @@ module.exports = router => {
       const previousStep = config.orderSteps[previousStepIndex];
       await cartManager.setCurrentStep(previousStep);
     }
-    return res.redirect('/order').end();
+    return res.redirect('/order');
   }));
 
   router.post('/order/next', canOrder, safeHandle(async (req, res, next) => {
@@ -83,26 +83,25 @@ module.exports = router => {
       }
       await cartManager.setCurrentStep(nextStepName);
       res.redirect('/order');
-      return;
-    } else {
-      // check if current handler
-      const currentHandlerData = cartManager.cart.stepFulfillments && cartManager.cart.stepFulfillments[currentStep];
-      log('[order] current handler data : ', currentHandlerData ? 'present' : 'not present');
-      if (currentHandlerData) {
-        const currentHandler = stepManager.getHandler(currentHandlerData.handlerName);
-        if (!currentHandler) { next(new Error('Step Handler not found')) };
-
-        return await currentHandler.middleware(req, res, async err => {
-          if (err) { return next(err); }
-          log(`[order] step fulffilled by plugin, redirecting...`);
-          await cartManager.clearCurrentStep();
-          return res.redirect('/order');
-        });
-      }
-
-      // if not, make user choose handler
-      const handlers = stepManager.getPossibleHandlers(currentStep);
-      res.render('order-choose-handler', { handlers, csrf : req.csrfToken() });
+      return null;
     }
+    // check if current handler
+    const currentHandlerData = cartManager.cart.stepFulfillments && cartManager.cart.stepFulfillments[currentStep];
+    log('[order] current handler data : ', currentHandlerData ? 'present' : 'not present');
+    if (currentHandlerData) {
+      const currentHandler = stepManager.getHandler(currentHandlerData.handlerName);
+      if (!currentHandler) { return next(new Error('Step Handler not found')) }
+
+      return await currentHandler.middleware(req, res, async err => {
+        if (err) { return next(err); }
+        log(`[order] step fulffilled by plugin, redirecting...`);
+        await cartManager.clearCurrentStep();
+        return res.redirect('/order');
+      });
+    }
+
+    // if not, make user choose handler
+    const handlers = stepManager.getPossibleHandlers(currentStep);
+    res.render('order-choose-handler', { handlers, csrf : req.csrfToken() });
   }));
 }
