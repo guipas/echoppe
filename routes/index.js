@@ -10,6 +10,7 @@ const config = require('../lib/config');
 const orderRoutes = require('./order.routes');
 const productRoutes = require('./product.routes');
 const cartRoutes = require('./cart.routes');
+const uploadRoutes = require('./upload.routes');
 const cartStatus = require('../lib/models/cart.status');
 
 module.exports = () => {
@@ -39,6 +40,7 @@ module.exports = () => {
   productRoutes(router);
   cartRoutes(router);
   orderRoutes(router);
+  uploadRoutes(router);
 
 
   return router;
