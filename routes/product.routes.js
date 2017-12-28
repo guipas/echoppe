@@ -36,7 +36,7 @@ module.exports = router => {
   router.post('/products', isAdmin, safeHandle(async (req, res) => {
     await models.product.add({
       name : req.body.name,
-      quantity : req.body.quantity,
+      stock : req.body.stock,
       price : req.body.price,
       description : req.body.description,
     });

@@ -70,6 +70,12 @@ module.exports = router => {
 
   router.all(`/order`, canOrder, safeHandle(async (req, res, next) => {
 
+    const quantityErrors = await cartManager.checkQuantities();
+
+    if (quantityErrors.length > 0) {
+      return res.redirect('/cart');
+    }
+
     const currentStep = cartManager.cart.currentStep;
     log('[order] current step : ', currentStep);
     if (!currentStep) {
@@ -102,6 +108,13 @@ module.exports = router => {
 
     // if not, make user choose handler
     const handlers = stepManager.getPossibleHandlers(currentStep);
+
+    // (unless there is just one handler for this step, in that case we select it automaticaly :)
+    if (handlers.length === 1) {
+      await cartManager.setStepData(cartManager.cart.currentStep, { handler : handlers[0].name });
+      return res.redirect('/order');
+    }
+
     res.render('order-choose-handler', { handlers, csrf : req.csrfToken() });
   }));
 }
