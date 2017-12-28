@@ -17,11 +17,28 @@ module.exports = router => {
       return;
     }
 
-    res.render('cart', { cart });
+    const quantityErrors = await req.shop.cartManager.checkQuantities();
+    const quantityErrorsMap = quantityErrors.reduce((m, curr) => { m[curr.productId] = curr.available; return m }, {});
+
+    res.render('cart', {
+      csrf : req.csrfToken(),
+      cart, quantityErrors, quantityErrorsMap
+    });
   }));
 
   router.post('/cart/products/:product', safeHandle(async (req, res) => {
     await req.shop.cartManager.addProduct(req.params.product);
+
+    if (req.wantsJson) {
+      res.end();
+    }
+
+    res.redirect('/cart');
+  }));
+
+  router.post('/cart/products/:product/quantity', safeHandle(async (req, res) => {
+    const quantity = parseInt(req.body.quantity, 10);
+    await req.shop.cartManager.setProductQuantity(req.params.product, quantity);
 
     if (req.wantsJson) {
       res.end();
