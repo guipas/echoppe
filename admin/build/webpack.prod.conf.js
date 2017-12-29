@@ -52,8 +52,24 @@ var webpackConfig = merge(baseWebpackConfig, {
     // generate dist index.html with correct asset hash for caching.
     // you can customize output by editing /index.html
     // see https://github.com/ampedandwired/html-webpack-plugin
+    // new HtmlWebpackPlugin({
+    //   filename: config.build.index,
+    //   template: 'admin/index.html',
+    //   inject: true,
+    //   minify: {
+    //     removeComments: true,
+    //     collapseWhitespace: true,
+    //     removeAttributeQuotes: true
+    //     // more options:
+    //     // https://github.com/kangax/html-minifier#options-quick-reference
+    //   },
+    //   // necessary to consistently work with multiple chunks via CommonsChunkPlugin
+    //   chunksSortMode: 'dependency',
+    //   serviceWorkerLoader: `<script>${loadMinified(path.join(__dirname,
+    //     './service-worker-prod.js'))}</script>`
+    // }),
     new HtmlWebpackPlugin({
-      filename: config.build.index,
+      filename: path.resolve(config.build.assetsRoot, 'index.ejs'),
       template: 'admin/index.html',
       inject: true,
       minify: {

@@ -6,6 +6,7 @@ module.exports = {
   name : 'My Shop',
   mongodbURI : process.env.MONGODB_URI,
   debug : process.env.NODE_ENV === `development`,
+  admin_dev : false,
   contentDir : path.join(__dirname, 'content'),
   url : 'http://localhost:3000/',
   currency : {

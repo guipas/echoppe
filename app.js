@@ -10,7 +10,6 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const csrf = require('csurf');
 const url = require('url');
-const defaultConfig = require('./default.config.js');
 const db  = require('./lib/db');
 const debugLog = require('./lib/debugLog');
 const mainMiddleware = require('./lib/main.middleware');
@@ -40,7 +39,7 @@ const init = (customConfig = {}) => {
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: false }));
     app.use(cookieParser());
-    app.use('/public', express.static(path.join(__dirname, 'content', 'public')));
+    app.use('/public', express.static(path.join(__dirname, 'public')));
     app.use(session({
       store: new MongoStore({ url:config.mongodbURI }),
       secret: process.env.SESSION_SECRET,
@@ -54,12 +53,12 @@ const init = (customConfig = {}) => {
     app.use('/', mainMiddleware);
     app.use('/', index(config));
 
-    if (process.env.NODE_ENV === `development`) {
-      // app.use('/admin', express.static(path.join(__dirname, 'admin', 'dist')));
+    if (config.admin_dev) {
+      console.log(`Using admin dev version`);
       app.use('/admin', require('./admin/build/dev-app'));
     } else {
+      app.get('/admin', (req, res) => res.render(path.join(__dirname, 'admin', 'dist', 'index.ejs'), { config }));
       app.use('/admin', express.static(path.join(__dirname, 'admin', 'dist')));
-
     }
 
     // catch 404 and forward to error handler

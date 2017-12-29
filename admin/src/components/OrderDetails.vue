@@ -33,7 +33,7 @@
             <div class="w-25 ba tc ma1 mr0 pa1">Total</div>
           </div>
           <div class="flex" v-for="(line, i) in order.content" :key="i">
-            <div class="w-25 ba ma1 ml0 pa1 overflow-hidden" style="white-space:nowrap;text-overflow:ellipsis;">{{ line.product.name }}</div>
+            <div class="w-25 ba ma1 ml0 pa1 overflow-hidden" style="white-space:nowrap;text-overflow:ellipsis;">{{ line.product ? line.product.name : '?' }}</div>
             <div class="w-25 ba ma1 pa1">{{ line.finalPrice }}</div>
             <div class="w-25 ba ma1 pa1">{{ line.quantity }}</div>
             <div class="w-25 ba ma1 mr0 pa1">{{ line.quantity * line.finalPrice }}</div>

@@ -1,18 +1,24 @@
 #!/usr/bin/env node
 
+'use strict';
+
 /**
  * Module dependencies.
  */
+const dev = process.argv.indexOf(`dev`) > -1 ? { admin_dev : true, debug : true } : null;
+if (dev) {
+  console.log('Running development version');
+}
 
-var app = require('../app')({});
-var debug = require('debug')('echoppe2:server');
-var http = require('http');
+const app = require('../app')({ ...dev });
+const debug = require('debug')('echoppe2:server');
+const http = require('http');
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
+const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
 /**

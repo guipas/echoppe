@@ -1,10 +1,12 @@
 {
   "name": "echoppe",
-  "version": "0.0.3",
+  "version": "0.0.8",
   "main": "app.js",
   "scripts": {
     "start": "node ./bin/www",
-    "build-admin": "node ./admin/build/build.js"
+    "dev": "node ./bin/www dev",
+    "build-admin": "node ./admin/build/build.js",
+    "prepare": "npm run build-admin"
   },
   "dependencies": {
     "body-parser": "~1.18.2",
