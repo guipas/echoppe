@@ -13,16 +13,17 @@ const url = require('url');
 const db  = require('./lib/db');
 const debugLog = require('./lib/debugLog');
 const mainMiddleware = require('./lib/main.middleware');
-const index = require('./routes/index');
+const routes = require('./routes/index');
 const wantsJson = require('./lib/wantsJson.middleware');
 const config = require('./lib/config');
 
 const init = (customConfig = {}) => {
-  // const config = { ...defaultConfig, ...customConfig };
   config.init(customConfig);
   const app = express();
 
   debugLog.init(config);
+  const log = debugLog.log;
+  log('Initializing echopppe...');
 
   db.init(config).then(() => {
     app.locals.linkTo = (...paths) => url.resolve(config.url, paths.join(`/`));
@@ -42,7 +43,7 @@ const init = (customConfig = {}) => {
     app.use('/public', express.static(path.join(__dirname, 'public')));
     app.use(session({
       store: new MongoStore({ url:config.mongodbURI }),
-      secret: process.env.SESSION_SECRET,
+      secret: config.sessionSecret,
       resave: false,
       saveUninitialized: false,
     }));
@@ -51,12 +52,13 @@ const init = (customConfig = {}) => {
 
     app.use('/csrf', (req, res) => res.json({ csrf : req.csrfToken() }));
     app.use('/', mainMiddleware);
-    app.use('/', index(config));
+    app.use('/', routes(config));
 
-    if (config.admin_dev) {
-      console.log(`Using admin dev version`);
+    if (config.adminDev) {
+      log(`Using dev version of admin`);
       app.use('/admin', require('./admin/build/dev-app'));
     } else {
+      log('Using bundled version of admin')
       app.get('/admin', (req, res) => res.render(path.join(__dirname, 'admin', 'dist', 'index.ejs'), { config }));
       app.use('/admin', express.static(path.join(__dirname, 'admin', 'dist')));
     }
@@ -78,6 +80,8 @@ const init = (customConfig = {}) => {
       res.status(err.status || 500);
       res.render('error');
     });
+
+    log('Up and runnnig : ', config.url);
   })
   .catch(err => {
     debugLog.log('Failed to connect to mongodb !')

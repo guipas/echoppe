@@ -5,8 +5,11 @@ const path = require('path');
 module.exports = {
   name : 'My Shop',
   mongodbURI : process.env.MONGODB_URI,
+  sessionSecret : process.env.SESSION_SECRET,
   debug : process.env.NODE_ENV === `development`,
-  admin_dev : false,
+  adminDev : false,
+  adminLogin : null,
+  adminHash : null,
   contentDir : path.join(__dirname, 'content'),
   url : 'http://localhost:3000/',
   currency : {
