@@ -26,6 +26,11 @@ const init = (customConfig = {}) => {
   const log = debugLog.log;
   log('Initializing echopppe...');
 
+  let initialized = null;
+  app.initialized = new Promise((resolve, reject) => {
+    initialized = resolve;
+  })
+
   db.init(config).then(() => {
     app.locals.linkTo = (...paths) => url.resolve(config.url, paths.join(`/`));
     app.locals.config = config;
@@ -84,13 +89,16 @@ const init = (customConfig = {}) => {
     });
 
     log('Up and runnnig : ', config.url);
+    initialized(app);
   })
   .catch(err => {
     debugLog.log('Failed to connect to mongodb !')
     debugLog.log(err);
     app.use((req, res) => {
       res.send('Failed to connect to database');
-    })
+    });
+
+    return Promise.reject(app);
   });
 
   return app;

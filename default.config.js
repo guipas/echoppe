@@ -20,5 +20,6 @@ module.exports = {
     { name : `small_square`, transform : { resize : [200, 200] } }
   ],
   orderSteps : ['order:shipping', 'order:payment'],
+  testConfig : {},
 
 };
