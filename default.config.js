@@ -6,11 +6,11 @@ module.exports = {
   name : 'My Shop',
   mongodbURI : process.env.MONGODB_URI,
   sessionSecret : process.env.SESSION_SECRET,
-  debug : process.env.NODE_ENV === `development`,
+  env : process.env.NODE_ENV, // "development", "production" or "test"
   adminDev : false,
-  adminLogin : null,
-  adminHash : null,
-  contentDir : path.join(__dirname, 'content'),
+  adminLogin : process.env.ECHOPPE_ADMIN_LOGIN,
+  adminHash : process.env.ECHOPPE_ADMIN_HASH,
+  contentDir : path.join(__dirname, 'content'), // app-generated content will go here
   url : 'http://localhost:3000/',
   currency : {
     code : 'USD',

@@ -5,7 +5,7 @@
 /**
  * Module dependencies.
  */
-const dev = process.argv.indexOf(`dev`) > -1 ? { admin_dev : true, debug : true } : null;
+const dev = process.argv.indexOf(`dev`) > -1 ? { adminDev : true, debug : true } : null;
 if (dev) {
   console.log('Running development version');
 }

@@ -37,6 +37,7 @@ module.exports = router => {
     });
 
   }));
+
   router.post('/admin/login', safeHandle(async (req, res) => {
     if (config.adminHash && config.adminLogin) {
       const userMatch = req.body.user === config.adminLogin;
@@ -56,5 +57,27 @@ module.exports = router => {
     }
 
     return res.redirect('.');
+  }));
+
+  router.post('/admin/logout', safeHandle(async (req, res) => {
+    if (req.session.isAdmin) {
+      console.log('IS ADMIN')
+      req.session.isAdmin = false;
+      return req.session.save(() => {
+        console.log('SESSION SAVED');
+        if (req.wantsJson) {
+          return res.end();
+        }
+
+        return res.redirect(config.url)
+      });
+    }
+    console.log('IS NOT ADMIN')
+
+    if (req.wantsJson) {
+      return res.end();
+    }
+
+    return res.redirect(config.url)
   }));
 }

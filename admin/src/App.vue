@@ -3,8 +3,9 @@
     <header>
       <div class="mw8 center pa3 white flex flex-wrap" style="align-items:center;">
         <div class=""><img src="/admin/static/img/echoppe_logo_white.png" alt="" style="max-width: 36px;" class="pr2"></div>
-        <div class="f2">Echoppe</div>
-        <div class="w-100 ttu f5 pt3">Admin</div>
+        <div class="f2 w-100">Echoppe</div>
+        <div class="ttu f5 pt3">Admin</div>
+        <div class="f5 pt3 tr pointer" style="flex-grow:1;" @click="signout">&rarr; Sign out</div>
 
       </div>
     </header>
@@ -25,6 +26,11 @@ export default {
   },
   components : {
     TabNav
+  },
+  methods : {
+    signout() {
+      this.$store.dispatch('signOut');
+    }
   }
 };
 </script>

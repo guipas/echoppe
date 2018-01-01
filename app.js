@@ -16,6 +16,7 @@ const mainMiddleware = require('./lib/main.middleware');
 const routes = require('./routes/index');
 const wantsJson = require('./lib/wantsJson.middleware');
 const config = require('./lib/config');
+const isAdmin = require('./lib/isAdmin.auth.middleware');
 
 const init = (customConfig = {}) => {
   config.init(customConfig);
@@ -56,11 +57,11 @@ const init = (customConfig = {}) => {
 
     if (config.adminDev) {
       log(`Using dev version of admin`);
-      app.use('/admin', require('./admin/build/dev-app'));
+      app.use('/admin', isAdmin, require('./admin/build/dev-app'));
     } else {
       log('Using bundled version of admin')
       app.get('/admin', (req, res) => res.render(path.join(__dirname, 'admin', 'dist', 'index.ejs'), { config }));
-      app.use('/admin', express.static(path.join(__dirname, 'admin', 'dist')));
+      app.use('/admin', isAdmin, express.static(path.join(__dirname, 'admin', 'dist')));
     }
 
     // catch 404 and forward to error handler
@@ -72,9 +73,10 @@ const init = (customConfig = {}) => {
 
     // error handler
     app.use(function(err, req, res, next) {
+      log('ERROR : ', err);
       // set locals, only providing error in development
       res.locals.message = err.message;
-      res.locals.error = req.app.get('env') === 'development' ? err : {};
+      res.locals.error = config.env === 'development' ? err : {};
 
       // render the error page
       res.status(err.status || 500);
