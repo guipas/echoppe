@@ -6,6 +6,7 @@ module.exports = {
   name : 'My Shop',
   mongodbURI : process.env.MONGODB_URI,
   sessionSecret : process.env.SESSION_SECRET,
+  sessionUseStore : true,
   env : process.env.NODE_ENV, // "development", "production" or "test"
   adminDev : false,
   adminLogin : process.env.ECHOPPE_ADMIN_LOGIN,
@@ -20,6 +21,4 @@ module.exports = {
     { name : `small_square`, transform : { resize : [200, 200] } }
   ],
   orderSteps : ['order:shipping', 'order:payment'],
-  testConfig : {},
-
 };

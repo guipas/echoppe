@@ -7,7 +7,7 @@
     "dev": "node ./bin/www dev",
     "build-admin": "node ./admin/build/build.js",
     "prepare": "npm run build-admin",
-    "test" : "node_modules/.bin/jest"
+    "test": "node_modules/.bin/jest"
   },
   "dependencies": {
     "bcrypt": "^1.0.3",

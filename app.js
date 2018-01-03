@@ -31,9 +31,11 @@ const init = (customConfig = {}) => {
     initialized = resolve;
   })
 
-  db.init(config).then(() => {
+  db.init(config).then(connection => {
+    log('connected successfuly to database');
     app.locals.linkTo = (...paths) => url.resolve(config.url, paths.join(`/`));
     app.locals.config = config;
+    app.locals.connection = connection;
 
     // view engine setup
     app.set('views', path.join(__dirname, 'lib/default-front'));
@@ -48,7 +50,7 @@ const init = (customConfig = {}) => {
     app.use(cookieParser());
     app.use('/public', express.static(path.join(__dirname, 'public')));
     app.use(session({
-      store: new MongoStore({ url:config.mongodbURI }),
+      store : config.sessionUseStore ? new MongoStore({ url:config.mongodbURI }) : null,
       secret: config.sessionSecret,
       resave: false,
       saveUninitialized: false,
