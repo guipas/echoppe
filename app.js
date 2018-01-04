@@ -17,6 +17,7 @@ const routes = require('./routes/index');
 const wantsJson = require('./lib/wantsJson.middleware');
 const config = require('./lib/config');
 const isAdmin = require('./lib/isAdmin.auth.middleware');
+const mailer = require('./lib/mailer');
 
 const init = (customConfig = {}) => {
   config.init(customConfig);
@@ -25,6 +26,8 @@ const init = (customConfig = {}) => {
   debugLog.init(config);
   const log = debugLog.log;
   log('Initializing echopppe...');
+
+  mailer.init(config);
 
   let initialized = null;
   app.initialized = new Promise((resolve, reject) => {

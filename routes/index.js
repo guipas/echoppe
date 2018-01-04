@@ -13,6 +13,7 @@ const cartRoutes = require('./cart.routes');
 const uploadRoutes = require('./upload.routes');
 const adminRoutes = require('./admin.routes');
 const cartStatus = require('../lib/models/cart.status');
+const eventManager = require('../lib/eventManager');
 
 module.exports = () => {
   const router = express.Router();
@@ -25,6 +26,7 @@ module.exports = () => {
 
   router.get('/', safeHandle(async (req, res) => {
     const products = await models.product.list();
+    eventManager.emit('hit:index');
     res.render('index', { products, csrf : req.csrfToken() });
   }));
 

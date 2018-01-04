@@ -26,6 +26,7 @@ module.exports = router => {
     });
   }));
 
+
   router.post('/cart/products/:product', safeHandle(async (req, res) => {
     await req.shop.cartManager.addProduct(req.params.product);
 
