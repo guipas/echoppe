@@ -28,16 +28,6 @@ module.exports = router => {
   }));
 
 
-  router.get('/orders/:order', isAdmin, safeHandle(async (req, res, next) => {
-    const order = await models.cart.orders.fetch(req.params.order);
-
-    if (req.wantsJson) {
-      return res.json(order);
-    }
-    console.log(receipt(order));
-    return res.render('order-summary', { cart : order, receipt : receipt(order).replace(/\n/gm, '<br/>'), config });
-  }));
-
   router.post('/order/choice', canOrder, safeHandle(async (req, res, next) => {
     const handlerName = req.body.choice;
     await req.shop.cartManager.setStepData(req.shop.cartManager.cart.currentStep, { handler : handlerName });

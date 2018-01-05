@@ -13,6 +13,7 @@ module.exports = {
   adminLogin : process.env.ECHOPPE_ADMIN_LOGIN,
   adminHash : process.env.ECHOPPE_ADMIN_HASH,
   contentDir : path.join(__dirname, 'content'), // app-generated content will go here
+  publicDir : path.join(__dirname, 'public'),
   url : 'http://localhost:3000/',
   currency : {
     code : 'USD',

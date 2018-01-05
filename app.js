@@ -18,6 +18,7 @@ const wantsJson = require('./lib/wantsJson.middleware');
 const config = require('./lib/config');
 const isAdmin = require('./lib/isAdmin.auth.middleware');
 const mailer = require('./lib/mailer');
+const linkTo = require('./lib/linkTo');
 
 const init = (customConfig = {}) => {
   config.init(customConfig);
@@ -36,7 +37,7 @@ const init = (customConfig = {}) => {
 
   db.init(config).then(connection => {
     log('connected successfuly to database');
-    app.locals.linkTo = (...paths) => url.resolve(config.url, paths.join(`/`));
+    app.locals.linkTo = linkTo;
     app.locals.config = config;
     app.locals.connection = connection;
 
@@ -51,7 +52,7 @@ const init = (customConfig = {}) => {
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: false }));
     app.use(cookieParser());
-    app.use('/public', express.static(path.join(__dirname, 'public')));
+    app.use('/public', express.static(config.publicDir));
     app.use(session({
       store : config.sessionUseStore ? new MongoStore({ url:config.mongodbURI }) : null,
       secret: config.sessionSecret,
