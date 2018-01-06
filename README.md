@@ -14,7 +14,7 @@ npm install echoppe
 
 Then, add it to your existing express app, or create a simple one like this :
 
-```
+```javascript
 const express = require('express')
 const app = express();
 const echopppe = require('echoppe');
