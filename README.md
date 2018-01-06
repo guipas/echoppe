@@ -29,6 +29,6 @@ app.listen(3000, () => console.log('Example app listening on port 3000!'))
 - [X] Simple admin (with `Vue.js`)
 - [X] Basic theme (using `bootstrap`)
 - [X] Extendable theme
-- [] Digital product
-- [] Plugin system
-- [] *Direct buy* link for all products
+- [ ] Digital product
+- [ ] Plugin system
+- [ ] *Direct buy* link for all products
