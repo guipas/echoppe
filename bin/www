@@ -5,24 +5,28 @@
 /**
  * Module dependencies.
  */
-const dev = process.argv.indexOf(`dev`) > -1 ? { adminDev : true, debug : true } : null;
-if (dev) {
-  console.log('Running development version');
-  dev.emails = {
+const config = {
+  debug : true,
+  emails : {
     from : "igc5mjkybiknytd3@ethereal.email",
-  };
-  dev.emails.transporter = {
-    host: 'smtp.ethereal.email',
-    port: 587,
-    secure: false, // true for 465, false for other ports
-    auth: {
-        user: "igc5mjkybiknytd3@ethereal.email", // generated ethereal user
-        pass: "m8hqPYHj1mzAxamGcp"  // generated ethereal password
+    transporter : {
+      host: 'smtp.ethereal.email',
+      port: 587,
+      secure: false, // true for 465, false for other ports
+      auth: {
+          user: "igc5mjkybiknytd3@ethereal.email", // generated ethereal user
+          pass: "m8hqPYHj1mzAxamGcp"  // generated ethereal password
+      }
     }
   }
+};
+
+if (process.argv.indexOf(`dev`) > -1) {
+  console.log('Running development version');
+  config.adminDev = true;
 }
 
-const app = require('../app')({ ...dev });
+const app = require('../app')(config);
 const debug = require('debug')('echoppe2:server');
 const http = require('http');
 

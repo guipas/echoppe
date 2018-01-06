@@ -1,9 +1,6 @@
 'use strict';
 
 const express = require('express');
-const path = require('path');
-const _ = require('lodash');
-const isAdmin = require('../lib/isAdmin.auth.middleware');
 const safeHandle = require(`../lib/safeHandle`);
 const models = require('../lib/models');
 const config = require('../lib/config');
@@ -17,7 +14,6 @@ const eventManager = require('../lib/eventManager');
 
 module.exports = () => {
   const router = express.Router();
-
 
   router.post('/api/admin/login', (req, res) => {
     req.session.isAdmin = true;

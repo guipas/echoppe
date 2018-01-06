@@ -1,14 +1,12 @@
 'use strict';
 
 const _ = require('lodash');
-const isAdmin = require('../lib/isAdmin.auth.middleware');
+const isAdmin = require('../lib/isAdmin.middleware');
 const safeHandle = require(`../lib/safeHandle`);
 const models = require('../lib/models');
 const config = require('../lib/config');
 const stepManager = require('../lib/stepManager');
 const log       = require('../lib/debugLog').log;
-const receipt = require('../lib/receipt');
-const path = require('path');
 
 const canOrder = safeHandle(async (req, res, next) => {
   if (!await req.shop.cartManager.canOrder()) {

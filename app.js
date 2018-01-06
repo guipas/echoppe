@@ -16,7 +16,7 @@ const mainMiddleware = require('./lib/main.middleware');
 const routes = require('./routes/index');
 const wantsJson = require('./lib/wantsJson.middleware');
 const config = require('./lib/config');
-const isAdmin = require('./lib/isAdmin.auth.middleware');
+const isAdmin = require('./lib/isAdmin.middleware');
 const mailer = require('./lib/mailer');
 const linkTo = require('./lib/linkTo');
 

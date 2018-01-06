@@ -1,12 +1,10 @@
 'use strict';
 
-const _ = require('lodash');
 const path = require('path');
-const isAdmin = require('../lib/isAdmin.auth.middleware');
+const isAdmin = require('../lib/isAdmin.middleware');
 const safeHandle = require(`../lib/safeHandle`);
 const models = require('../lib/models');
 const config = require('../lib/config');
-const log       = require('../lib/debugLog').log;
 const mediaManager = require('../lib/mediaManager');
 
 

@@ -3,8 +3,8 @@
   "version": "0.0.8",
   "main": "app.js",
   "scripts": {
-    "start": "node ./bin/www",
-    "dev": "node ./bin/www dev",
+    "dev": "forever -w ./bin/www --watchIgnore",
+    "dev-admin": "forever -w ./bin/www --watchIgnore -- dev",
     "build-admin": "node ./admin/build/build.js",
     "prepare": "npm run build-admin",
     "test": "node_modules/.bin/jest"
@@ -20,6 +20,7 @@
     "ejs": "^2.5.7",
     "express": "~4.15.5",
     "express-session": "^1.15.6",
+    "forever": "^0.15.3",
     "jest": "^22.0.4",
     "lodash": "^4.17.4",
     "mkdirp": "^0.5.1",
