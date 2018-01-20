@@ -32,14 +32,18 @@ module.exports = router => {
   }));
 
   router.post('/products', isAdmin, safeHandle(async (req, res) => {
-    await models.product.add({
+    const product = await models.product.add({
       name : req.body.name,
       stock : req.body.stock,
       price : req.body.price,
       description : req.body.description,
     });
 
-    res.end();
+    if (req.wantsJson) {
+      return res.json(product);
+    }
+
+    return res.end();
   }));
 
   router.put('/products/:product', isAdmin, safeHandle(async (req, res) => {

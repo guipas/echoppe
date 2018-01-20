@@ -19,6 +19,7 @@ const config = require('./lib/config');
 const isAdmin = require('./lib/isAdmin.middleware');
 const mailer = require('./lib/mailer');
 const linkTo = require('./lib/linkTo');
+const eventManager = require('./lib/eventManager');
 
 const init = (customConfig = {}) => {
   config.init(customConfig);
@@ -29,6 +30,7 @@ const init = (customConfig = {}) => {
   log('Initializing echopppe...');
 
   mailer.init(config);
+  eventManager.init();
 
   let initialized = null;
   app.initialized = new Promise((resolve, reject) => {
@@ -58,11 +60,13 @@ const init = (customConfig = {}) => {
       secret: config.sessionSecret,
       resave: false,
       saveUninitialized: false,
+      cookie : {
+        httpOnly : false,
+      },
     }));
-    app.use(csrf({ cookie: true }));
+    app.use(csrf());
     app.use(wantsJson);
 
-    app.use('/csrf', (req, res) => res.json({ csrf : req.csrfToken() }));
     app.use('/', mainMiddleware);
     app.use('/', routes(config));
 
@@ -71,7 +75,7 @@ const init = (customConfig = {}) => {
       app.use('/admin', isAdmin, require('./admin/build/dev-app'));
     } else {
       log('Using bundled version of admin')
-      app.get('/admin', (req, res) => res.render(path.join(__dirname, 'admin', 'dist', 'index.ejs'), { config }));
+      app.get('/admin', isAdmin, (req, res) => res.render(path.join(__dirname, 'admin', 'dist', 'index.ejs'), { config }));
       app.use('/admin', isAdmin, express.static(path.join(__dirname, 'admin', 'dist')));
     }
 

@@ -22,7 +22,7 @@ module.exports = () => {
 
   router.get('/', safeHandle(async (req, res) => {
     const products = await models.product.list();
-    eventManager.emit('hit:index');
+    eventManager.emitter.emit('hit:index');
     res.render('index', { products, csrf : req.csrfToken() });
   }));
 
@@ -35,6 +35,8 @@ module.exports = () => {
       cartStatusArray : Object.keys(cartStatus).map(k => ({ status : k, value : cartStatus[k] })),
     });
   }));
+
+  router.get('/csrf', (req, res) => res.json({ csrf : req.csrfToken() }));
 
   productRoutes(router);
   cartRoutes(router);

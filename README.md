@@ -26,9 +26,10 @@ app.listen(3000, () => console.log('Example app listening on port 3000!'))
 
 ## Roadmap
 
-- [X] Simple admin (with `Vue.js`)
+- [X] Simple admin (using `Vue.js`)
 - [X] Basic theme (using `bootstrap`)
 - [X] Extendable theme
+- [X] Basic email notification after a sell (using `nodemailer`)
 - [ ] Digital products
 - [ ] Plugin system
 - [ ] Simple onboarding after install
