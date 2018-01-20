@@ -61,7 +61,7 @@ const init = (customConfig = {}) => {
       resave: false,
       saveUninitialized: false,
       cookie : {
-        httpOnly : false,
+        httpOnly : true,
       },
     }));
     app.use(csrf());
