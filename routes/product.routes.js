@@ -23,12 +23,15 @@ module.exports = router => {
 
   router.get('/products/:product', safeHandle(async (req, res) => {
     const product = await models.product.fetch(req.params.product);
-    if (req.wantsJson) {
-      res.json(product).end();
-      return;
+    if (!product) {
+      return res.status(404).end();
     }
 
-    res.render('product', { product, csrf : req.csrfToken() });
+    if (req.wantsJson) {
+      return res.json(product).end();
+    }
+
+    return res.render('product', { product, csrf : req.csrfToken() });
   }));
 
   router.post('/products', isAdmin, safeHandle(async (req, res) => {

@@ -17,6 +17,9 @@ const app = require('../app')({
   adminHash : '$2a$10$mDlMToHYMK2pbjVdReBdveHCqaCGLpUu/GrBy9RK707VNQQ2dh7H6', // 75f6a3399491121c
 });
 
+const adminUser = 'admin';
+const adminPassword = '75f6a3399491121c';
+
 
 const expressApp = express();
 expressApp.use((req, res, next) => {
@@ -90,27 +93,98 @@ test('Can not create product if not admin', async () => {
 });
 
 
-test('Create a product', async () => {
-  expect.assertions(7);
+test('Create a product just with a name', async () => {
+  expect.assertions(8);
 
   const agent = request.agent();
-  const { csrf } = await helpers.logInAsAdmin(agent, url, 'admin', '75f6a3399491121c');
+  const { csrf } = await helpers.logInAsAdmin(agent, url, adminUser, adminPassword);
 
   const res = await helpers.createProduct(agent, url, {
     name : 't',
-    stock : 0,
-    price : 0,
-    description : 'd',
     _csrf : csrf,
   });
 
   expect(res.status).toBe(200);
   expect(res.body).toBeDefined();
   expect(res.body._id).toBeDefined();
+  expect(res.body.id).toBeDefined();
   expect(res.body.name).toBe('t');
   expect(res.body.stock).toBe(0);
   expect(res.body.price).toBe(0);
-  expect(res.body.description).toBe('d');
+  expect(res.body.description).toBeUndefined();
+});
+
+test('fetching a product by its id', async () => {
+  expect.assertions(4);
+
+  const agent = request.agent();
+  const { csrf } = await helpers.logInAsAdmin(agent, url, adminUser, adminPassword);
+
+  const createRes = await helpers.createProduct(agent, url, {
+    name : 't',
+    _csrf : csrf,
+  });
+
+  const res = await request.get(url + '/products/' + createRes.body.id).accept('json');
+
+  expect(res.status).toBe(200);
+  expect(res.body).toBeDefined();
+  expect(res.body._id).toBeDefined();
+  expect(res.body._id).toBe(createRes.body._id);
+});
+
+test('deleting a product ', async () => {
+  expect.assertions(4);
+
+  const agent = request.agent();
+  const { csrf } = await helpers.logInAsAdmin(agent, url, adminUser, adminPassword);
+
+  const createRes = await helpers.createProduct(agent, url, {
+    name : 't',
+    _csrf : csrf,
+  });
+
+  const destroyRes = await agent.delete(url + '/products/' + createRes.body.id).send({ _csrf : csrf }).accept('json');
+
+  expect(destroyRes.status).toBe(200);
+
+  let res = null;
+  try {
+    res = await request.get(url + '/products/' + createRes.body.id).accept('json');
+  } catch (e) {
+    expect(res).toBe(null);
+    expect(e).toBeDefined();
+    expect(e.status).toBe(404);
+  }
+});
+
+test('modifying a product ', async () => {
+  expect.assertions(5);
+
+  const agent = request.agent();
+  const { csrf } = await helpers.logInAsAdmin(agent, url, adminUser, adminPassword);
+
+  const createRes = await helpers.createProduct(agent, url, {
+    name : 't',
+    _csrf : csrf,
+  });
+
+  const putRes = await agent
+    .put(url + '/products/' + createRes.body.id)
+    .send({
+      _csrf : csrf,
+      name  : 'x',
+    })
+    .accept('json');
+
+  expect(putRes.status).toBe(200);
+
+  const res = await request.get(url + '/products/' + createRes.body.id).accept('json');
+
+  expect(res).toBeDefined();
+  expect(res.status).toBe(200);
+  expect(res.body).toBeDefined();
+  expect(res.body.name).toBe('x');
 });
 
 // test('Creating a product requires to be admin')
