@@ -58,7 +58,7 @@ module.exports = router => {
     res.end();
   }));
 
-  router.put('/products/:product/uploads', isAdmin, upload.array('files'), safeHandle(async (req, res) => {
+  router.post('/products/:product/uploads', isAdmin, upload.array('files'), safeHandle(async (req, res) => {
     await models.upload.addBulk(req.files.map(file => ({
       name : file.originalname,
       filename : file.filename,

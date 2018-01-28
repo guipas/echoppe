@@ -8,6 +8,8 @@ module.exports = {
   sessionSecret : process.env.SESSION_SECRET,
   sessionUseStore : true,
   env : process.env.NODE_ENV, // "development", "production" or "test"
+  debugLog : process.env.NODE_ENV === "development",
+  requestLog : process.env.NODE_ENV === "development" ? 'dev' : null,
   emails : null,
   adminDev : false,
   adminLogin : process.env.ECHOPPE_ADMIN_LOGIN,
