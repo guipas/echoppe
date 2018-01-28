@@ -22,3 +22,4 @@ _*
 .env
 /content
 !/content/public
+/tests/content
