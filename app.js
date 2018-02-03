@@ -8,11 +8,12 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
+const mongoose = require('mongoose');
 const csrf = require('csurf');
-const url = require('url');
 const db  = require('./lib/db');
 const debugLog = require('./lib/debugLog');
 const mainMiddleware = require('./lib/main.middleware');
+const currentCartMiddleware = require('./lib/currentCart.middleware');
 const routes = require('./routes/index');
 const wantsJson = require('./lib/wantsJson.middleware');
 const config = require('./lib/config');
@@ -41,7 +42,7 @@ const init = (customConfig = {}) => {
     log('connected successfuly to database');
     app.locals.linkTo = linkTo;
     app.locals.config = config;
-    app.locals.connection = connection;
+    app.locals.connection = mongoose.connection;
 
     // view engine setup
     app.set('views', path.join(__dirname, 'lib/default-front'));
@@ -70,6 +71,7 @@ const init = (customConfig = {}) => {
     app.use(wantsJson);
 
     app.use('/', mainMiddleware);
+    app.use('/', currentCartMiddleware);
     app.use('/', routes(config));
 
     if (config.adminDev) {

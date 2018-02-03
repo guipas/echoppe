@@ -18,5 +18,21 @@ module.exports = {
   },
   async createProduct (agent, url, product) {
     return await agent.post(url + '/products').accept('json').send(product);
+  },
+  async loginAndCreateProduct (args) {
+    console.log(args);
+    const { csrf } = await this.logInAsAdmin(args.agent, args.url, args.username, args.password);
+    const productToCreate = args.agentproduct || {
+      name : `x`,
+    };
+    const res = await this.createProduct(args.agent, args.url, {
+      _csrf : csrf,
+      ...productToCreate,
+    });
+
+
+    return {
+      product : res.body,
+    }
   }
 }

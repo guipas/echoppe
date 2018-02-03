@@ -9,7 +9,8 @@ const stepManager = require('../lib/stepManager');
 const log       = require('../lib/debugLog').log;
 
 const canOrder = safeHandle(async (req, res, next) => {
-  if (!await req.shop.cartManager.canOrder()) {
+  const cart = await req.shop.getCurrentCart();
+  if (!await cart.canOrder()) {
     return res.redirect('/cart');
   }
 
@@ -28,63 +29,68 @@ module.exports = router => {
 
   router.post('/order/choice', canOrder, safeHandle(async (req, res, next) => {
     const handlerName = req.body.choice;
-    await req.shop.cartManager.setStepData(req.shop.cartManager.cart.currentStep, { handler : handlerName });
+    const cart = await req.shop.getCurrentCart();
+    await cart.setStepData(cart.currentStep, { handler : handlerName });
     return res.redirect('/order');
   }));
 
   router.post('/order/previous', canOrder, safeHandle(async (req, res, next) => {
-    const currentStep = req.shop.cartManager.cart.currentStep;
+    const cart = await req.shop.getCurrentCart();
+    const currentStep = cart.currentStep;
     const currentStepIndex = _.indexOf(config.orderSteps, currentStep);
     const previousStepIndex = currentStepIndex - 1;
     if (previousStepIndex >= 0) {
       const previousStep = config.orderSteps[previousStepIndex];
-      await req.shop.cartManager.setCurrentStep(previousStep);
+      await cart.setCurrentStep(previousStep);
     }
     return res.redirect('/order');
   }));
 
   router.post('/order/next', canOrder, safeHandle(async (req, res, next) => {
-    const currentStep = req.shop.cartManager.cart.currentStep;
+    const cart = await req.shop.getCurrentCart();
+    const currentStep = cart.currentStep;
     const currentStepIndex = _.indexOf(config.orderSteps, currentStep);
-    const currentStepData = req.shop.cartManager.cart.stepFulfillments[currentStep];
+    const currentStepData = cart.stepFulfillments[currentStep];
     const nextStepIndex = currentStepIndex + 1;
     if (currentStepData && currentStepData.state === 'complete' && nextStepIndex < config.orderSteps.length) {
       const nextStep = config.orderSteps[nextStepIndex];
-      await req.shop.cartManager.setCurrentStep(nextStep);
+      await cart.setCurrentStep(nextStep);
     }
     return res.redirect('/order').end();
   }));
 
   router.get('/order/cancel', safeHandle(async (req, res, next) => {
-    await req.shop.cartManager.destroy();
+    const cart = await req.shop.getCurrentCart();
+    await cart.remove();
     res.redirect('/cart');
   }))
 
   router.all(`/order`, canOrder, safeHandle(async (req, res, next) => {
 
-    const quantityErrors = await req.shop.cartManager.checkQuantities();
+    const cart = await req.shop.getCurrentCart();
+    const quantityErrors = await cart.checkQuantities();
 
     if (quantityErrors.length > 0) {
       return res.redirect('/cart');
     }
 
-    const currentStep = req.shop.cartManager.cart.currentStep;
+    const currentStep = cart.currentStep;
     log('[order] current step : ', currentStep);
     if (!currentStep) {
       log('[order] going to next step');
-      const nextStepName = config.orderSteps.find(stepName => !req.shop.cartManager.cart.stepFulfillments || !req.shop.cartManager.cart.stepFulfillments[stepName]);
+      const nextStepName = config.orderSteps.find(stepName => !cart.stepFulfillments || !cart.stepFulfillments[stepName]);
       if (!nextStepName) {
         // finished
         log('[order] order finished');
-        req.shop.cartManager.complete();
+        cart.complete();
         return res.render('order-thank-you');
       }
-      await req.shop.cartManager.setCurrentStep(nextStepName);
+      await cart.setCurrentStep(nextStepName);
       res.redirect('/order');
       return null;
     }
     // check if current handler
-    const currentHandlerData = req.shop.cartManager.cart.stepFulfillments && req.shop.cartManager.cart.stepFulfillments[currentStep];
+    const currentHandlerData = cart.stepFulfillments && cart.stepFulfillments[currentStep];
     log('[order] current handler data : ', currentHandlerData ? 'present' : 'not present');
     if (currentHandlerData) {
       const currentHandler = stepManager.getHandler(currentHandlerData.handlerName);
@@ -93,7 +99,7 @@ module.exports = router => {
       return await currentHandler.middleware(req, res, async err => {
         if (err) { return next(err); }
         log(`[order] step fulffilled by plugin, redirecting...`);
-        await req.shop.cartManager.clearCurrentStep();
+        await cart.clearCurrentStep();
         return res.redirect('/order');
       });
     }
@@ -103,7 +109,7 @@ module.exports = router => {
 
     // (unless there is just one handler for this step, in that case we select it automaticaly :)
     if (handlers.length === 1) {
-      await req.shop.cartManager.setStepData(req.shop.cartManager.cart.currentStep, { handler : handlers[0].name });
+      await cart.setStepData(cart.currentStep, { handler : handlers[0].name });
       return res.redirect('/order');
     }
 
