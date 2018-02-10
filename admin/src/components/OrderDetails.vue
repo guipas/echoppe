@@ -44,6 +44,7 @@
           <h3>Address</h3>
           <div class="flex">
             <div class="">
+              <span class="db pa1 address-element">Name :</span>
               <span class="db pa1 address-element">Email :</span>
               <span class="db pa1 address-element">Address 1 : </span>
               <span class="db pa1 address-element">Address 2 : </span>
@@ -52,6 +53,7 @@
               <span class="db pa1 address-element">Country :</span>
             </div>
             <div class="" style="flex-grow:1;">
+              <span class="db pa1 b address-element"><span>{{ address.customer }}&nbsp;</span></span>
               <span class="db pa1 b address-element"><span>{{ address.email }}&nbsp;</span></span>
               <span class="db pa1 b address-element"><span>{{ address.line1 }}&nbsp;</span></span>
               <span class="db pa1 b address-element"><span>{{ address.line2 }}&nbsp;</span></span>

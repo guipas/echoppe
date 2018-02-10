@@ -21,7 +21,13 @@ const canOrder = safeHandle(async (req, res, next) => {
 module.exports = router => {
 
   router.get('/orders', isAdmin, safeHandle(async (req, res, next) => {
-    const orders = await models.cart.orders.list();
+    const orders = await models.cart.listOrders();
+
+    return res.json(orders);
+  }));
+
+  router.get('/orders/:order', isAdmin, safeHandle(async (req, res, next) => {
+    const orders = await models.cart.fetchOrder(req.params.order);
 
     return res.json(orders);
   }));
@@ -67,10 +73,13 @@ module.exports = router => {
 
   router.all(`/order`, canOrder, safeHandle(async (req, res, next) => {
 
+    log('[order] Ordering...');
+
     const cart = await req.shop.getCurrentCart();
     const quantityErrors = await cart.checkQuantities();
 
     if (quantityErrors.length > 0) {
+      log(quantityErrors);
       return res.redirect('/cart');
     }
 

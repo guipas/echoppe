@@ -22,7 +22,7 @@ module.exports = () => {
 
   router.get('/', safeHandle(async (req, res) => {
     const products = await models.product.list();
-    eventManager.emitter.emit('hit:index');
+    eventManager.broadcast('hit:index');
     res.render('index', { products, csrf : req.csrfToken() });
   }));
 

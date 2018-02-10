@@ -13,7 +13,7 @@ module.exports = router => {
       return;
     }
 
-    const quantityErrors = cart.checkQuantities();
+    const quantityErrors = await cart.checkQuantities();
     const quantityErrorsMap = quantityErrors.reduce((m, curr) => { m[curr.productId] = curr.available; return m }, {});
 
     res.render('cart', {
@@ -24,7 +24,7 @@ module.exports = router => {
 
 
   router.post('/cart/products/:product', safeHandle(async (req, res) => {
-    const cart = await req.shop.getCurrentCart().catch(e => console.log('------=', e));
+    const cart = await req.shop.getCurrentCart();
     await cart.addProduct(req.params.product);
 
     if (req.wantsJson) {

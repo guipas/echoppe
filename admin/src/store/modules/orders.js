@@ -48,7 +48,7 @@ export default {
     },
     updateOrder ({ commit, rootState, state, dispatch }, order) {
       commit('SET_CURRENT_ORDER_LOADING', true);
-      return axios.put(`/cart/${state.currentOrder._id}`, order, rootState.axiosConfig)
+      return axios.put(`/carts/${state.currentOrder._id}`, order, rootState.axiosConfig)
       .then(() => dispatch(`fetchOrder`, state.currentOrder._id))
       .catch(err => {
         commit('SET_CURRENT_ORDER_LOADING', false);

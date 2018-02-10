@@ -93,7 +93,7 @@ export default {
       for (var x = 0; x < elem.files.length; x++) {
         data.append("files", elem.files[x]);
       }
-      axios.put(`/products/${product._id}/uploads`, data, rootState.axiosConfig)
+      axios.post(`/products/${product._id}/uploads`, data, rootState.axiosConfig)
       .then(res => {
         log('upload success', res);
         dispatch('fetchProduct', product._id);
