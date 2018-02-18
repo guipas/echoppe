@@ -58,7 +58,7 @@ test('Accessing admin without being logged in returns a 401', async () => {
   let err = null;
 
   try {
-    await request.get(url + '/admin');
+    await request.get(url + '/admin').accept('json');
   } catch (e) {
     err = e;
   }

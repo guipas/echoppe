@@ -3,12 +3,7 @@
 const request = require('superagent');
 const mongoose = require('mongoose');
 const express = require('express')
-const path = require('path');
 const helpers = require('./helpers');
-const fs = require('fs');
-const util = require('util');
-const fsAccess = util.promisify(fs.access);
-const fsUnlink = util.promisify(fs.unlink);
 const port = 3011;
 const config = require('./config')({ port });
 
@@ -104,6 +99,7 @@ test('User can not modify cart directly', async () => {
 
   await agent.put(config.app.url + '/carts/' + cartId)
   .send({ _csrf })
+  .accept('json')
   .catch(err => {
     expect(err).toBeDefined();
     expect(err.response.status).toBe(401)

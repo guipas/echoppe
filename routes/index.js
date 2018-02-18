@@ -10,33 +10,36 @@ const cartRoutes = require('./cart.routes');
 const uploadRoutes = require('./upload.routes');
 const adminRoutes = require('./admin.routes');
 const cartStatus = require('../lib/models/cart.status');
-const eventManager = require('../lib/eventManager');
+const middlewareManager = require('../lib/middlewareManager');
+const csrf = require('../lib/csrf.middleware.js');
 
 module.exports = () => {
   const router = express.Router();
 
-  router.post('/api/admin/login', (req, res) => {
-    req.session.isAdmin = true;
-    res.end();
-  })
+  router.get('/',
+    ...middlewareManager.getMiddlewares('index', true, `get`),
+    csrf,
+    safeHandle(async (req, res, next) => {
+      res.locals.products = await models.product.list();
+      next();
+    }),
+    ...middlewareManager.getMiddlewares('index', false, `get`)
+  );
 
-  router.get('/', safeHandle(async (req, res) => {
-    const products = await models.product.list();
-    eventManager.broadcast('hit:index');
-    res.render('index', { products, csrf : req.csrfToken() });
-  }));
+  router.get('/settings',
+    ...middlewareManager.getMiddlewares('settings', true, `get`),
+    safeHandle(async (req, res) => {
+      return res.json({
+        name : config.name,
+        url : config.url,
+        currency : config.currency,
+        cartStatus,
+        cartStatusArray : Object.keys(cartStatus).map(k => ({ status : k, value : cartStatus[k] })),
+      });
+    },
+  ));
 
-  router.get('/settings', safeHandle(async (req, res) => {
-    return res.json({
-      name : config.name,
-      url : config.url,
-      currency : config.currency,
-      cartStatus,
-      cartStatusArray : Object.keys(cartStatus).map(k => ({ status : k, value : cartStatus[k] })),
-    });
-  }));
-
-  router.get('/csrf', (req, res) => res.json({ csrf : req.csrfToken() }));
+  router.get('/csrf', csrf, (req, res) => res.json({ csrf : res.locals.csrf }));
 
   productRoutes(router);
   cartRoutes(router);

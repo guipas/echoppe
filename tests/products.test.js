@@ -84,7 +84,7 @@ test('Can not create product if not admin', async () => {
   let err = null;
 
   try {
-    await agent.post(url + '/products').type('application/json').send({ _csrf : csrf });
+    await agent.post(url + '/products').type('application/json').accept('json').send({ _csrf : csrf });
   } catch (e) {
     err = e;
   }
