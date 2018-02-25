@@ -75,7 +75,7 @@ test('Request list of product return an empty array', async () => {
 
 
 test('Can not create product if not admin', async () => {
-  expect.assertions(4);
+  expect.assertions(2);
 
   const agent = request.agent();
   const csrfRes = await agent.get(url + '/csrf');
@@ -91,8 +91,6 @@ test('Can not create product if not admin', async () => {
 
   expect(err).toBeDefined();
   expect(err.status).toBe(401);
-  expect(err.response.text.indexOf(`not allowed`)).not.toBe(-1);
-  expect(err.response.text.indexOf(`csrf`)).toBe(-1);
 
 });
 

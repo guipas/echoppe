@@ -121,6 +121,7 @@ test('Admin can modify cart directly', async () => {
 
   await adminAgent.put(config.app.url + '/carts/' + cartId)
   .send({ _csrf : res.csrf, state : 99 })
+  .accept('json')
   .then(res => {
     expect(res).toBeDefined();
     expect(res.status).toBeDefined();

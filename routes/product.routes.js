@@ -16,26 +16,22 @@ module.exports = router => {
   const upload = multer({ dest: path.join(config.contentDir, `uploads`) });
 
   router.get('/products',
-    ...middlewareManager.getMiddlewares('products', true, `get`),
+    ...middlewareManager.getMiddlewares('products', 'get', 'start'),
+    ...middlewareManager.getMiddlewares('products', 'get', 'beforeLogic'),
     safeHandle(async (req, res, next) => {
       res.locals.products = await models.product.list();
       next();
     }),
-    ...middlewareManager.getMiddlewares('products:list', false, `get`),
-    safeHandle(async (req, res) => {
-      if (req.wantsJson) {
-        res.json(res.locals.products).end();
-        return;
-      }
-
-      res.end();
-    }),
+    ...middlewareManager.getMiddlewares('products', 'get', 'afterLogic'),
+    sendJson('products'),
+    ...middlewareManager.getMiddlewares('products', 'get', 'end'),
   );
 
 
   router.post('/products',
+  ...middlewareManager.getMiddlewares('products', 'post', 'start'),
     isAdmin,
-    ...middlewareManager.getMiddlewares('products', true, `post`),
+    ...middlewareManager.getMiddlewares('products', 'post', 'beforeLogic'),
     safeHandle(async (req, res, next) => {
       res.locals.product = await models.product.add({
         name : req.body.name,
@@ -45,20 +41,17 @@ module.exports = router => {
       });
       next();
     }),
-    ...middlewareManager.getMiddlewares('products', false, `post`),
-    safeHandle(async (req, res) => {
-      if (req.wantsJson) {
-        return res.json(res.locals.product);
-      }
-
-      return res.end();
-    }),
+    ...middlewareManager.getMiddlewares('products', 'post', 'afterLogic'),
+    sendJson('product'),
+    ...middlewareManager.getMiddlewares('products', 'post', 'end'),
+    end,
   );
 
 
   router.get('/products/:product',
-    ...middlewareManager.getMiddlewares('product', true, `get`),
+    ...middlewareManager.getMiddlewares('product', 'get', 'start'),
     csrf,
+    ...middlewareManager.getMiddlewares('product', 'get', 'beforeLogic'),
     safeHandle(async (req, res, next) => {
       const product = await models.product.fetch(req.params.product);
       if (!product) {
@@ -72,13 +65,15 @@ module.exports = router => {
       res.locals.product = product;
       next();
     }),
-    ...middlewareManager.getMiddlewares('product', false, `get`),
+    ...middlewareManager.getMiddlewares('product', 'get', 'afterLogic'),
+    ...middlewareManager.getMiddlewares('product', 'get', 'end'),
   );
 
 
   router.put('/products/:product',
+  ...middlewareManager.getMiddlewares('product', `put`, 'start'),
     isAdmin,
-    ...middlewareManager.getMiddlewares('product', true, `put`),
+    ...middlewareManager.getMiddlewares('product', `put`, 'beforeLogic'),
     safeHandle(async (req, res, next) => {
       res.locals.product = await models.product.modify({
         ...req.body,
@@ -87,14 +82,16 @@ module.exports = router => {
 
       next();
     }),
-    ...middlewareManager.getMiddlewares('product', false, `put`),
+    ...middlewareManager.getMiddlewares('product', `put`, 'afterLogic'),
     sendJson('product'),
+    ...middlewareManager.getMiddlewares('product', `put`, 'end'),
     end,
   );
 
   router.post('/products/:product/uploads',
+  ...middlewareManager.getMiddlewares('product_uploads', 'post', 'start'),
     isAdmin,
-    ...middlewareManager.getMiddlewares('product:uploads', true, `post`),
+    ...middlewareManager.getMiddlewares('product_uploads', 'post', 'beforeLogic'),
     upload.array('files'),
     safeHandle(async (req, res) => {
       res.locals.uploads = await models.upload.addBulk(req.files.map(file => ({
@@ -108,20 +105,23 @@ module.exports = router => {
 
       res.end();
     }),
-    ...middlewareManager.getMiddlewares('product:uploads', false, `post`),
+    ...middlewareManager.getMiddlewares('product_uploads', 'post', 'afterLogic'),
     sendJson('uploads'),
+    ...middlewareManager.getMiddlewares('product_uploads', 'post', 'end'),
     end,
   );
 
   router.delete('/products/:product',
+    ...middlewareManager.getMiddlewares('product', `delete`, 'start'),
     isAdmin,
-    ...middlewareManager.getMiddlewares('product', true, `delete`),
-    safeHandle(async (req, res) => {
+    ...middlewareManager.getMiddlewares('product', `delete`, 'beforeLogic'),
+    safeHandle(async (req, res, next) => {
       await models.product.destroy(req.params.product);
 
       res.end();
     }),
-    ...middlewareManager.getMiddlewares('product', false, `delete`),
+    // ...middlewareManager.getMiddlewares('product' `delete`, 'afterLogic'),
+    // ...middlewareManager.getMiddlewares('product' `delete`, 'end'),
   );
 
 };

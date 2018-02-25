@@ -21,6 +21,9 @@ const isAdmin = require('./lib/isAdmin.middleware');
 const mailer = require('./lib/mailer');
 const linkTo = require('./lib/linkTo');
 const pluginManager = require('./lib/pluginManager');
+const middlewareManager = require('./lib/middlewareManager');
+const sendJson = require('./lib/sendJson.middleware');
+const end = require('./lib/end.middleware');
 
 const init = (customConfig = {}) => {
   config.init(customConfig);
@@ -45,7 +48,7 @@ const init = (customConfig = {}) => {
     app.locals.connection = mongoose.connection;
 
     // view engine setup
-    app.set('views', path.join(__dirname, 'lib/default-front'));
+    // app.set('views', path.join(__dirname, 'lib/default-front'));
     app.set('view engine', 'ejs');
     app.set('view options', { _with : false });
 
@@ -84,23 +87,30 @@ const init = (customConfig = {}) => {
     }
 
     // catch 404 and forward to error handler
-    app.use(function(req, res, next) {
-      var err = new Error('Not Found');
+    app.use((req, res, next) => {
+      const err = new Error('Not Found');
       err.status = 404;
       next(err);
     });
 
     // error handler
-    app.use(function(err, req, res, next) {
-      log('ERROR : ', err);
-      // set locals, only providing error in development
-      res.locals.message = err.message;
-      res.locals.error = config.env === 'development' ? err : {};
+    app.use(
+      (err, req, res, next) => {
+        log('ERROR : ', err);
+        // set locals, only providing error in development
+        res.locals.message = err.message;
+        res.locals.error = config.env === 'development' ? err : {};
 
-      // render the error page
-      res.status(err.status || 500);
-      res.render('error');
-    });
+        // render the error page
+        res.status(err.status || 500);
+
+        next();
+      },
+      ...middlewareManager.getMiddlewares('error', null, 'afterLogic'),
+      sendJson(config.env === 'development' ? 'error' : 'message'),
+      ...middlewareManager.getMiddlewares('error', null, 'end'),
+      (req, res) => res.send(res.locals.message),
+    );
 
     log('Up and runnnig : ', config.url);
     initialized(app);
