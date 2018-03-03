@@ -43,12 +43,12 @@ module.exports = () => {
       res.locals.cartStatusArray = Object.keys(cartStatus).map(k => ({ status : k, value : cartStatus[k] }));
 
       next();
-    },
+    }),
     ...middlewareManager.getMiddlewares('settings', 'get', 'afterLogic'),
     sendJson,
     ...middlewareManager.getMiddlewares('settings', 'get', 'end'),
     end,
-  ));
+  );
 
   router.get('/csrf', csrf, (req, res) => res.json({ csrf : res.locals.csrf }));
 

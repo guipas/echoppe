@@ -12,7 +12,7 @@ module.exports = router => {
   router.get('/cart',
     ...middlewareManager.getMiddlewares('cart', 'get', 'start'),
     ...middlewareManager.getMiddlewares('cart', 'get', 'beforeLogic'),
-    safeHandle(async (req, res) => {
+    safeHandle(async (req, res, next) => {
       const cart = await req.shop.getCurrentCart();
 
       if (req.wantsJson) {
@@ -24,8 +24,10 @@ module.exports = router => {
       const quantityErrorsMap = quantityErrors.reduce((m, curr) => { m[curr.productId] = curr.available; return m }, {});
 
       res.locals.cart = cart;
-      res.lcoals.quantityErrors = quantityErrors;
+      res.locals.quantityErrors = quantityErrors;
       res.locals.quantityErrorsMap = quantityErrorsMap;
+
+      next();
     }),
     ...middlewareManager.getMiddlewares('cart', 'get', 'afterLogic'),
     csrf,
@@ -68,6 +70,25 @@ module.exports = router => {
     ...middlewareManager.getMiddlewares('cart_products', 'put', 'afterLogic'),
     sendJson('cart'),
     ...middlewareManager.getMiddlewares('cart_products', 'put', 'end'),
+    safeHandle(async (req, res) => {
+      res.redirect('/cart');
+    }),
+  );
+
+  router.post('/cart/products/:product/quantity',
+    ...middlewareManager.getMiddlewares('cart_products_quantity', 'post', 'start'),
+    ...middlewareManager.getMiddlewares('cart_products_quantity', 'post', 'beforeLogic'),
+    safeHandle(async (req, res, next) => {
+      const cart = await req.shop.getCurrentCart();
+      const quantity = parseInt(req.body.quantity, 10);
+      await cart.setProductQuantity(req.params.product, quantity);
+
+      res.locals.cart = cart;
+      next();
+    }),
+    ...middlewareManager.getMiddlewares('cart_products_quantity', 'post', 'afterLogic'),
+    sendJson('cart'),
+    ...middlewareManager.getMiddlewares('cart_products_quantity', 'post', 'end'),
     safeHandle(async (req, res) => {
       res.redirect('/cart');
     }),

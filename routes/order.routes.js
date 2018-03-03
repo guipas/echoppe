@@ -7,6 +7,7 @@ const models = require('../lib/models');
 const config = require('../lib/config');
 const stepManager = require('../lib/stepManager');
 const log       = require('../lib/debugLog').log;
+const middlewareManager = require('../lib/middlewareManager');
 
 const canOrder = safeHandle(async (req, res, next) => {
   const cart = await req.shop.getCurrentCart();
@@ -92,7 +93,8 @@ module.exports = router => {
         // finished
         log('[order] order finished');
         cart.complete();
-        return res.render('order-thank-you');
+        // return res.render('order-thank-you');
+        return next();
       }
       await cart.setCurrentStep(nextStepName);
       res.redirect('/order');
@@ -123,5 +125,7 @@ module.exports = router => {
     }
 
     res.render('order-choose-handler', { handlers, csrf : req.csrfToken() });
-  }));
+  }),
+  ...middlewareManager.getMiddlewares('order', 'get', 'end'),
+  );
 }

@@ -4,4 +4,4 @@
 **/.tmp/**
 *.less
 **/admin/**
-./content/
+./content/**

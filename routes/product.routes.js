@@ -93,7 +93,7 @@ module.exports = router => {
     isAdmin,
     ...middlewareManager.getMiddlewares('product_uploads', 'post', 'beforeLogic'),
     upload.array('files'),
-    safeHandle(async (req, res) => {
+    safeHandle(async (req, res, next) => {
       res.locals.uploads = await models.upload.addBulk(req.files.map(file => ({
         name : file.originalname,
         filename : file.filename,
@@ -102,8 +102,7 @@ module.exports = router => {
         type : file.mimetype,
         product : req.params.product,
       })));
-
-      res.end();
+      next();
     }),
     ...middlewareManager.getMiddlewares('product_uploads', 'post', 'afterLogic'),
     sendJson('uploads'),
