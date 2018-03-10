@@ -20,7 +20,6 @@ module.exports = {
     return await agent.post(url + '/products').accept('json').send(product);
   },
   async loginAndCreateProduct (args) {
-    console.log(args);
     const { csrf } = await this.logInAsAdmin(args.agent, args.url, args.username, args.password);
     const productToCreate = args.agentproduct || {
       name : `x`,

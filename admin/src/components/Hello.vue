@@ -1,7 +1,7 @@
 <template>
-  <div class="hello">
+  <b-row>
     <product-list></product-list>
-  </div>
+  </b-row>
 </template>
 
 <script>

@@ -1,6 +1,5 @@
 'use strict';
 
-const url = 'http://localhost:3010/test';
 
 const request = require('superagent');
 const mongoose = require('mongoose');
@@ -12,38 +11,22 @@ const util = require('util');
 const fsAccess = util.promisify(fs.access);
 const fsUnlink = util.promisify(fs.unlink);
 let server = null;
-const app = require('../app')({
-  env : 'test',
-  debugLog : true,
-  requestLog : 'dev',
-  url,
-  contentDir : path.join(__dirname, 'content'),
-  mongodbURI : process.env.ECHOPPE_TEST_MONGODBURI,
-  sessionUseStore : false,
-  adminHash : '$2a$10$mDlMToHYMK2pbjVdReBdveHCqaCGLpUu/GrBy9RK707VNQQ2dh7H6', // 75f6a3399491121c
-});
+const config = require('./config');
+const app = require('../app')(config.app);
 
+const url = config.app.url;
 const adminUser = 'admin';
 const adminPassword = '75f6a3399491121c';
-
-
 const expressApp = express();
-expressApp.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  next();
-})
 expressApp.use('/test', app);
 
 const emptyDb = () => app.locals.connection.db.dropDatabase();
-
-
-
 
 beforeAll(() => {
   return app.initialized
   .then(() => {
     return new Promise((res) => {
-      server = expressApp.listen(3010, () => {
+      server = expressApp.listen(config.app.port, () => {
         res();
       })
     })
@@ -251,7 +234,7 @@ test('Admin can upload a product image', async () => {
     .accept('json')
     .attach('files', path.join(__dirname, `./o.png`))
   } catch (e) {
-    console.log(e);
+    console.error(e);
   }
 
   expect(res).toBeDefined();
@@ -270,7 +253,7 @@ test('Admin can upload a product image', async () => {
     await fsAccess(uploadedFile);
     access = true;
   } catch (e) {
-    console.log(e);
+    console.error(e);
     access = false;
   }
 

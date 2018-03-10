@@ -60,10 +60,8 @@ module.exports = router => {
 
   router.post('/admin/logout', safeHandle(async (req, res) => {
     if (req.session.isAdmin) {
-      console.log('IS ADMIN')
       req.session.isAdmin = false;
       return req.session.save(() => {
-        console.log('SESSION SAVED');
         if (req.wantsJson) {
           return res.end();
         }
@@ -71,7 +69,6 @@ module.exports = router => {
         return res.redirect(config.url)
       });
     }
-    console.log('IS NOT ADMIN')
 
     if (req.wantsJson) {
       return res.end();

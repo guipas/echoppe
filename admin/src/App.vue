@@ -1,6 +1,6 @@
 <template>
   <div id="app" class="">
-    <header>
+    <!-- <header>
       <div class="mw8 center pa3 white flex flex-wrap" style="align-items:center;">
         <div class=""><img src="/admin/static/img/echoppe_logo_white.png" alt="" style="max-width: 36px;" class="pr2"></div>
         <div class="f2 w-100">Echoppe</div>
@@ -8,16 +8,20 @@
         <div class="f5 pt3 tr pointer" style="flex-grow:1;" @click="signout">&rarr; Sign out</div>
 
       </div>
-    </header>
-    <tab-nav></tab-nav>
-    <main class="mw8 center">
-      <router-view></router-view>
+    </header> -->
+
+    <nav-bar></nav-bar>
+    <main>
+      <b-container>
+        <router-view></router-view>
+      </b-container>
     </main>
   </div>
 </template>
 
 <script>
 import TabNav from './components/TabNav';
+import NavBar from './components/NavBar';
 
 export default {
   name: 'app',
@@ -25,7 +29,8 @@ export default {
     this.$store.dispatch('init');
   },
   components : {
-    TabNav
+    TabNav,
+    NavBar
   },
   methods : {
     signout() {
@@ -36,28 +41,28 @@ export default {
 </script>
 
 <style>
-html {
-  font-size: 12px;
-}
-body {
-  margin: 0;
-  font-family: 'Roboto', sans-serif;
-  font-size: 1.5rem;
-}
+  /* html {
+    font-size: 12px;
+  }
+  body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.5rem;
+  }
 
-h1, h2, h3 {
-  font-size: 1.5rem;
-  text-transform: uppercase;
-  font-weight: bold;
-}
-h3 {
-  text-transform: none;
-}
-a {
-  color: black;
-  text-decoration: none;
-}
-header {
-  background: lightskyblue;
-}
+  h1, h2, h3 {
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+  h3 {
+    text-transform: none;
+  }
+  a {
+    color: black;
+    text-decoration: none;
+  }
+  header {
+    background: lightskyblue;
+  } */
 </style>

@@ -4,8 +4,7 @@ const request = require('superagent');
 const mongoose = require('mongoose');
 const express = require('express')
 const helpers = require('./helpers');
-const port = 3011;
-const config = require('./config')({ port });
+const config = require('./config');
 
 let server = null;
 const app = require('../app')(config.app);
@@ -20,7 +19,7 @@ beforeAll(() => {
   return app.initialized
   .then(() => {
     return new Promise(res => {
-      server = expressApp.listen(port, () => res());
+      server = expressApp.listen(config.app.port, () => res());
     });
   })
   .then(() => emptyDb())

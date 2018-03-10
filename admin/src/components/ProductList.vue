@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <b-col>
     <top-nav>
       <div class="tr">
         <default-button v-on:click.native="goToNewProduct">+ New product</default-button>
@@ -11,16 +11,14 @@
           Product list
         </h1>
         <hr>
-          <div class="product-list" v-if="products && products.length >0">
-            <div :key="product._id" class="product pa2 bg-black-10" v-for="product in products">
-              <router-link class="no-underline db" :to="{ name : 'ProductDetails', params: { productId : product._id} }">
-                {{ product.name }}
-              </router-link>
-            </div>
-          </div>
+        <b-list-group class="product-list" v-if="products && products.length >0">
+          <b-list-group-item :key="product._id" class="product pa2 bg-black-10" v-for="product in products" :to="{ name : 'ProductDetails', params: { productId : product._id} }">
+            {{ product.name }}
+          </b-list-group-item>
+        </b-list-group>
       </content-card>
     </div>
-  </div>
+  </b-col>
 </template>
 
 <script>

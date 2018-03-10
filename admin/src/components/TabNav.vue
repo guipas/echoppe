@@ -19,7 +19,6 @@ export default {
   },
   computed : {
     route () {
-      console.log(this.$router);
       return this.$router.name;
     },
     items () {

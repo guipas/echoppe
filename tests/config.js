@@ -4,12 +4,14 @@ const path = require('path');
 
 const adminUser = 'admin';
 const adminPassword = '75f6a3399491121c';
+const port = 3011;
 
-module.exports = ({ port }) => ({
+module.exports = {
   app : {
     env : 'test',
-    debugLog : true,
+    debugLog : false,
     requestLog : 'dev',
+    port,
     url :  `http://localhost:${port}/test`,
     contentDir : path.join(__dirname, 'content'),
     mongodbURI : process.env.ECHOPPE_TEST_MONGODBURI,
@@ -18,4 +20,4 @@ module.exports = ({ port }) => ({
   },
   adminPassword,
   adminUser,
-});
+};

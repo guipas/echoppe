@@ -42,7 +42,6 @@ module.exports = router => {
       const cart = await req.shop.getCurrentCart();
       await cart.addProduct(req.params.product);
 
-      console.log('cart after putin product :', cart);
       await cart.save();
 
       res.locals.cart = cart;
