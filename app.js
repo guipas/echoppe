@@ -23,7 +23,6 @@ const linkTo = require('./lib/linkTo');
 const pluginManager = require('./lib/pluginManager');
 const middlewareManager = require('./lib/middlewareManager');
 const sendJson = require('./lib/sendJson.middleware');
-const end = require('./lib/end.middleware');
 
 const init = (customConfig = {}) => {
   config.init(customConfig);
@@ -41,7 +40,7 @@ const init = (customConfig = {}) => {
     initialized = resolve;
   })
 
-  db.init(config).then(connection => {
+  db.init(config).then(connection => { // eslint-disable-line
     log('connected successfuly to database');
     app.locals.linkTo = linkTo;
     app.locals.config = config;
@@ -53,7 +52,7 @@ const init = (customConfig = {}) => {
     app.set('view options', { _with : false });
 
     // uncomment after placing your favicon in /public
-    //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+    // app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
     if (config.requestLog) {
       app.use(logger(config.requestLog));
     }
@@ -62,7 +61,7 @@ const init = (customConfig = {}) => {
     app.use(cookieParser());
     app.use('/public', express.static(config.publicDir));
     app.use(session({
-      store : config.sessionUseStore ? new MongoStore({ url:config.mongodbURI }) : null,
+      store : config.sessionUseStore ? new MongoStore({ url : config.mongodbURI }) : null,
       secret: config.sessionSecret,
       resave: false,
       saveUninitialized: false,
@@ -75,11 +74,14 @@ const init = (customConfig = {}) => {
 
     app.use('/', mainMiddleware);
     app.use('/', currentCartMiddleware);
-    app.use('/', routes(config));
+    app.use('/',
+      ...middlewareManager.getMiddlewares('all', null, null),
+      routes(config),
+    );
 
     if (config.adminDev) {
       log(`Using dev version of admin`);
-      app.use('/admin', isAdmin, require('./admin/build/dev-app'));
+      app.use('/admin', isAdmin, require('./admin/build/dev-app')); //eslint-disable-line
     } else {
       log('Using bundled version of admin')
       app.get('/admin', isAdmin, (req, res) => res.render(path.join(__dirname, 'admin', 'dist', 'index.ejs'), { config }));
