@@ -27,26 +27,20 @@
 
           <div class="product-form-element product-images-gallery" v-if="product.id">
             <label>Product images :</label>
-            <div class="product-images tl mt4">
-              <!-- <div class="product-images-item relative" v-for="upload in originalProduct.uploads" :key="upload.id">
-                <img :src="upload.link + '/thumbnail?format=small_square'" alt="">
-                <div class="product-images-item-delete pointer absolute right-0 bottom-0" v-on:click="deleteUpload(upload)">❌</div>
-                <div class="product-images-item-feature pointer absolute right-2 bottom-0" v-on:click="featureUpload(upload)">{{ product.featured && product.featured._id === upload._id ? '⭐️' : '☆' }}</div>
-              </div> -->
+            <b-card-group deck>
                 <b-card
                   v-for="upload in originalProduct.uploads" :key="upload.id"
                   :img-src="upload.link + '/thumbnail?format=small_square'"
                   img-top
                   style="max-width: 200px"
-                  class="mb-2">
-                <b-btn size="sm" variant="secondary" v-on:click="deleteUpload(upload)">Delete</b-btn>
-                  {{ product.featured ? product.featured._id : null }} /
-                  {{ upload._id }}
+                  class="mb-2 text-center">
                 <b-btn size="sm" variant="secondary" v-on:click="featureUpload(upload)">
-                  {{ product.featured && product.featured._id === upload._id ? '⭐ Featured' : 'Feature' }}
+                  {{ featured && featured._id === upload._id ? '⭐ Featured' : '☆ Feature' }}
                 </b-btn>
+                <br>
+                <b-btn class="mt-2" size="sm" variant="secondary" v-on:click="deleteUpload(upload)">Delete</b-btn>
                 </b-card>
-            </div>
+            </b-card-group>
           </div>
 
           <b-form-group id="fieldset4" label="Add images" label-for="product-details-uploads" v-if="product.id">
@@ -99,14 +93,16 @@ export default {
   },
   props: ['productId'],
   mounted () {
-
     this.loadProduct();
   },
   computed : {
     ...mapState({
       originalProduct : state => state.products.currentProduct,
       loading : state => state.products.currentProductLoading,
-    })
+    }),
+    featured () {
+      return this.product.featured;
+    },
   },
   methods: {
     loadProduct () {
