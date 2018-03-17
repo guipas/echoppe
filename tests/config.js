@@ -12,9 +12,9 @@ module.exports = {
     debugLog : false,
     requestLog : 'dev',
     port,
-    url :  `http://localhost:${port}/test`,
+    url :  `http://localhost:${port}/test/`,
     contentDir : path.join(__dirname, 'content'),
-    mongodbURI : process.env.ECHOPPE_TEST_MONGODBURI,
+    mongodbURI : `mongodb://localhost:27017/echoppetest`,
     sessionUseStore : false,
     adminHash : '$2a$10$mDlMToHYMK2pbjVdReBdveHCqaCGLpUu/GrBy9RK707VNQQ2dh7H6', // 75f6a3399491121c
   },

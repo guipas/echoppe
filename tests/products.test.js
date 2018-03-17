@@ -202,7 +202,7 @@ test('Must be admin to upload image', async () => {
   let err = null;
   try {
     res = await agent2
-    .post(`${url}/products/${createRes.body.id}/uploads`)
+    .post(`${url}/products/${createRes.body.id}/medias`)
     .set('csrf-token', csrf2)
     .accept('json')
     .attach('files', path.join(__dirname, `./o.png`))
@@ -229,7 +229,7 @@ test('Admin can upload a product image', async () => {
   let res = null;
   try {
     res = await agent
-    .post(`${url}/products/${createRes.body.id}/uploads`)
+    .post(`${url}/products/${createRes.body.id}/medias`)
     .set('csrf-token', csrf)
     .accept('json')
     .attach('files', path.join(__dirname, `./o.png`))
@@ -242,13 +242,13 @@ test('Admin can upload a product image', async () => {
   const checkRes = await request.get(url + '/products/' + createRes.body.id).accept('json');
 
   expect(checkRes.body).toBeDefined();
-  expect(checkRes.body.uploads).toBeDefined();
-  expect(checkRes.body.uploads.length).toBeDefined();
-  expect(checkRes.body.uploads.length).toBe(1);
-  expect(checkRes.body.uploads[0].name).toBe(`o.png`);
+  expect(checkRes.body.medias).toBeDefined();
+  expect(checkRes.body.medias.length).toBeDefined();
+  expect(checkRes.body.medias.length).toBe(1);
+  expect(checkRes.body.medias[0].name).toBe(`o.png`);
 
   let access = false;
-  const uploadedFile = path.join(__dirname, 'content', 'uploads', checkRes.body.uploads[0].filename)
+  const uploadedFile = path.join(__dirname, 'content', 'uploads', checkRes.body.medias[0].filename)
   try {
     await fsAccess(uploadedFile);
     access = true;
@@ -260,6 +260,58 @@ test('Admin can upload a product image', async () => {
   expect(access).toBe(true);
 
   await fsUnlink(uploadedFile);
+});
+
+test('Admin can upload multiple product images', async () => {
+  expect.assertions(8);
+
+  const agent = request.agent();
+  const { csrf } = await helpers.logInAsAdmin(agent, url, adminUser, adminPassword);
+
+  const createRes = await helpers.createProduct(agent, url, {
+    name : 't',
+    _csrf : csrf,
+  });
+
+  let res = null;
+  try {
+    res = await agent
+    .post(`${url}/products/${createRes.body.id}/medias`)
+    .set('csrf-token', csrf)
+    .accept('json')
+    .attach('files', path.join(__dirname, `./o.png`))
+    .attach('files', path.join(__dirname, `./o2.png`))
+  } catch (e) {
+    console.error(e);
+  }
+
+  expect(res).toBeDefined();
+
+  const checkRes = await request.get(url + '/products/' + createRes.body.id).accept('json');
+
+  expect(checkRes.body).toBeDefined();
+  expect(checkRes.body.medias).toBeDefined();
+  expect(checkRes.body.medias.length).toBeDefined();
+  expect(checkRes.body.medias.length).toBe(2);
+  expect(checkRes.body.medias[0].name).toBe(`o.png`);
+  expect(checkRes.body.medias[1].name).toBe(`o2.png`);
+
+  let access = false;
+  const uploadedFile = path.join(__dirname, 'content', 'uploads', checkRes.body.medias[0].filename)
+  const uploadedFile2 = path.join(__dirname, 'content', 'uploads', checkRes.body.medias[1].filename)
+  try {
+    await fsAccess(uploadedFile);
+    await fsAccess(uploadedFile2);
+    access = true;
+  } catch (e) {
+    console.error(e);
+    access = false;
+  }
+
+  expect(access).toBe(true);
+
+  await fsUnlink(uploadedFile);
+  await fsUnlink(uploadedFile2);
 });
 
 

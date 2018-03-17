@@ -1,16 +1,16 @@
 <template>
   <b-col>
     <top-nav>
-      <div class="tr">
-        <default-button v-on:click.native="goToNewProduct">+ New product</default-button>
+      <div class="py-3 text-right">
+        <b-btn v-on:click="goToNewProduct">+ New product</b-btn>
       </div>
     </top-nav>
     <div class="tl">
       <content-card>
-        <h1>
+        <h1 class="h3">
           Product list
         </h1>
-        <hr>
+        <!-- <hr> -->
         <b-list-group class="product-list" v-if="products && products.length >0">
           <b-list-group-item :key="product._id" class="product pa2 bg-black-10" v-for="product in products" :to="{ name : 'ProductDetails', params: { productId : product._id} }">
             {{ product.name }}

@@ -35,7 +35,7 @@
                   style="max-width: 200px"
                   class="mb-2 text-center">
                 <b-btn size="sm" variant="secondary" v-on:click="featureUpload(upload)">
-                  {{ featured && featured._id === upload._id ? '⭐ Featured' : '☆ Feature' }}
+                  {{ featured && featured._id === upload._id ? '⭐ Featured' : 'Feature' }}
                 </b-btn>
                 <br>
                 <b-btn class="mt-2" size="sm" variant="secondary" v-on:click="deleteUpload(upload)">Delete</b-btn>

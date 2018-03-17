@@ -1,21 +1,23 @@
 <template>
   <div>
     <div class="tl">
-      <content-card>
         <h1>
           Orders list
         </h1>
         <hr>
-          <div class="order-list" v-if="orders && orders.length >0">
-            <div :key="order._id" class="product flex bg-black-10 flex-wrap" v-for="order in orders">
-              <router-link class="db w-80 pa2" style="flex-grow:1;" :to="{ name : 'OrderDetails', params: { orderId : order._id} }">
-                {{ order._id }}
-              </router-link>
-              <div class="pa2 f4" style="align-self:center;">{{ stateLabel(order.state) }}</div>
-              <div class="w-100 bg-white-20 pa2 f4 pb3" style="align-self:center">Placed on : {{ moment(order.placedOn).format('YYYY-MM-DD') }}</div>
-            </div>
-          </div>
-      </content-card>
+          <b-list-group class="order-list" v-if="orders && orders.length >0">
+            <b-list-group-item
+              :key="order._id"
+              v-for="order in orders"
+              :to="{ name : 'OrderDetails', params: { orderId : order._id} }"
+              class="d-flex justify-content-between align-items-center"
+            >
+              <span>
+                ORDER ID : <bold>{{ order._id }}</bold>
+              </span>
+              <b-badge pill :variant="varientColor(order.state)">{{ stateLabel(order.state) }}</b-badge>
+            </b-list-group-item>
+          </b-list-group>
     </div>
   </div>
 </template>
@@ -40,6 +42,16 @@ export default {
   },
   methods : {
     moment,
+    varientColor (state) {
+      const label = this.stateLabel(state);
+      console.log('rrr', label, label === `COMPLETED`);
+      if (label === 'COMPLETED') {
+        console.log('mmmm')
+        return `success`;
+      }
+
+      return `secondary`;
+    },
     stateLabel (state) {
       if (this.$store.state.settings) {
         const status = _.find(this.$store.state.settings.cartStatusArray, { value : state });

@@ -88,13 +88,13 @@ module.exports = router => {
     end,
   );
 
-  router.post('/products/:product/uploads',
-  ...middlewareManager.getMiddlewares('product_uploads', 'post', 'start'),
+  router.post('/products/:product/medias',
+  ...middlewareManager.getMiddlewares('product_medias', 'post', 'start'),
     isAdmin,
-    ...middlewareManager.getMiddlewares('product_uploads', 'post', 'beforeLogic'),
+    ...middlewareManager.getMiddlewares('product_medias', 'post', 'beforeLogic'),
     upload.array('files'),
     safeHandle(async (req, res, next) => {
-      res.locals.uploads = await models.upload.addBulk(req.files.map(file => ({
+      res.locals.medias = await models.media.addBulk(req.files.map(file => ({
         name : file.originalname,
         filename : file.filename,
         description : ``,
@@ -104,9 +104,9 @@ module.exports = router => {
       })));
       next();
     }),
-    ...middlewareManager.getMiddlewares('product_uploads', 'post', 'afterLogic'),
-    sendJson('uploads'),
-    ...middlewareManager.getMiddlewares('product_uploads', 'post', 'end'),
+    ...middlewareManager.getMiddlewares('product_medias', 'post', 'afterLogic'),
+    sendJson('medias'),
+    ...middlewareManager.getMiddlewares('product_medias', 'post', 'end'),
     end,
   );
 
@@ -122,5 +122,12 @@ module.exports = router => {
     // ...middlewareManager.getMiddlewares('product' `delete`, 'afterLogic'),
     // ...middlewareManager.getMiddlewares('product' `delete`, 'end'),
   );
+
+  router.get('/product/test', safeHandle(async (req, res, next) => {
+    const products = require('../lib/seeds/books');
+    const result = await Promise.all(products.map(product => models.product.create(product)));
+
+    return res.json(result);
+  }));
 
 };

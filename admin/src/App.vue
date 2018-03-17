@@ -41,28 +41,9 @@ export default {
 </script>
 
 <style>
-  /* html {
-    font-size: 12px;
-  }
   body {
-    margin: 0;
     font-family: 'Roboto', sans-serif;
-    font-size: 1.5rem;
+    background: #f8f9fa;
   }
 
-  h1, h2, h3 {
-    font-size: 1.5rem;
-    text-transform: uppercase;
-    font-weight: bold;
-  }
-  h3 {
-    text-transform: none;
-  }
-  a {
-    color: black;
-    text-decoration: none;
-  }
-  header {
-    background: lightskyblue;
-  } */
 </style>

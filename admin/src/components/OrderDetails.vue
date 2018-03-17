@@ -1,89 +1,91 @@
 <template>
-  <div class="pb4">
-    <top-nav>
+  <b-row>
+    <b-col cols="12" class="py-3">
       <div class="tl">
-        <default-button v-on:click.native="goToOrderList">&larr; Back</default-button>
+        <b-btn v-on:click="goToOrderList">&larr; Back</b-btn>
       </div>
-    </top-nav>
+    </b-col>
     <span v-if="!order && loading">Loading...</span>
-    <div class="order" v-if="order">
-      <content-card>
-        <h2>Order details</h2>
-        <hr/>
-        <form-element>
-          <label>Id :</label>
-          <input type="text" v-model="order._id" disabled/>
-        </form-element>
-        <form-element three>
-          <label>Status</label>
-          <select class="" v-model="selectedState" :disabled="loading">
-            <option :value="orderStatus['COMPLETED']">COMPLETED</option>
-            <option :value="orderStatus['SHIPPED']">SHIPPED</option>
-            <option :value="orderStatus['RECEIVED']">RECEIVED</option>
-          </select>
-          <span v-if="loading" class="db pl1">Saving...</span>
-        </form-element>
-        <hr/>
-        <h3>Order Content</h3>
-        <div>
-          <div class="flex">
-            <div class="w-25 ba tc ma1 ml0 pa1 overflow-hidden" style="white-space:nowrap;text-overflow:ellipsis;">Product</div>
-            <div class="w-25 ba tc ma1 pa1">Price</div>
-            <div class="w-25 ba tc ma1 pa1">Quantity</div>
-            <div class="w-25 ba tc ma1 mr0 pa1">Total</div>
-          </div>
-          <div class="flex" v-for="(line, i) in order.content" :key="i">
-            <div class="w-25 ba ma1 ml0 pa1 overflow-hidden" style="white-space:nowrap;text-overflow:ellipsis;">{{ line.product ? line.product.name : '?' }}</div>
-            <div class="w-25 ba ma1 pa1">{{ line.finalPrice }}</div>
-            <div class="w-25 ba ma1 pa1">{{ line.quantity }}</div>
-            <div class="w-25 ba ma1 mr0 pa1">{{ line.quantity * line.finalPrice }}</div>
-          </div>
-        </div>
-        <div v-if="address">
-          <hr>
-          <h3>Address</h3>
-          <div class="flex">
-            <div class="">
-              <span class="db pa1 address-element">Name :</span>
-              <span class="db pa1 address-element">Email :</span>
-              <span class="db pa1 address-element">Address 1 : </span>
-              <span class="db pa1 address-element">Address 2 : </span>
-              <span class="db pa1 address-element">State : </span>
-              <span class="db pa1 address-element">Zipcode :</span>
-              <span class="db pa1 address-element">Country :</span>
-            </div>
-            <div class="" style="flex-grow:1;">
-              <span class="db pa1 b address-element"><span>{{ address.customer }}&nbsp;</span></span>
-              <span class="db pa1 b address-element"><span>{{ address.email }}&nbsp;</span></span>
-              <span class="db pa1 b address-element"><span>{{ address.line1 }}&nbsp;</span></span>
-              <span class="db pa1 b address-element"><span>{{ address.line2 }}&nbsp;</span></span>
-              <span class="db pa1 b address-element"><span>{{ address.state }}&nbsp;</span></span>
-              <span class="db pa1 b address-element"><span>{{ address.zipcode }}&nbsp;</span></span>
-              <span class="db pa1 b address-element"><span>{{ address.country }}&nbsp;</span></span>
-            </div>
+    <b-col cols="12">
+      <b-card v-if="order">
+        <b-card-body>
+          <h2>Order details</h2>
+          <hr/>
+          <b-form-group id="fieldset1" label="ID" label-for="id">
+            <b-form-input id="id" type="text" class="" v-model="order._id" disabled/>
+          </b-form-group>
 
-          </div>
-        </div>
-        <div v-if="payment">
-          <hr>
-          <h3>Payment</h3>
-          <div class="flex">
-            <div>
-              <span class="db pa1 payment-element">Status: </span>
-              <span class="db pa1 payment-element">Captured:</span>
-              <span class="db pa1 payment-element">Amount: </span>
-            </div>
-            <div>
-              <span class="db pa1 b payment-element"><span>{{ payment.status }}</span>&nbsp;</span>
-              <span class="db pa1 b payment-element"><span>{{ payment.captured }}</span>&nbsp;</span>
-              <span class="db pa1 b payment-element"><span>{{ payment.amount / 100 }} {{ payment.currency }}</span>&nbsp;</span>
-            </div>
+          <b-form-group id="fieldset2" label="Status" label-for="status">
+            <b-form-select class="" v-model="selectedState" :disabled="loading">
+              <option :value="orderStatus['COMPLETED']">COMPLETED</option>
+              <option :value="orderStatus['SHIPPED']">SHIPPED</option>
+              <option :value="orderStatus['RECEIVED']">RECEIVED</option>
+            </b-form-select>
+          </b-form-group>
 
+          <hr/>
+          <h3>Order Content</h3>
+          <div>
+            <b-row>
+              <b-col cols="3">Product</b-col>
+              <b-col cols="3">Price</b-col>
+              <b-col cols="3">Quantity</b-col>
+              <b-col cols="3">Total</b-col>
+            </b-row>
+            <b-row v-for="(line, i) in order.content" :key="i">
+              <b-col cols="3">{{ line.product ? line.product.name : '?' }}</b-col>
+              <b-col cols="3">{{ line.finalPrice }}</b-col>
+              <b-col cols="3">{{ line.quantity }}</b-col>
+              <b-col cols="3">{{ line.quantity * line.finalPrice }}</b-col>
+            </b-row>
           </div>
-        </div>
-      </content-card>
-    </div>
-  </div>
+          <div v-if="address">
+            <hr>
+            <h3>Address</h3>
+            <b-row>
+              <b-col cols="6">
+                <div>Name :</div>
+                <div>Email :</div>
+                <div>Address 1 : </div>
+                <div>Address 2 : </div>
+                <div>State : </div>
+                <div>Zipcode :</div>
+                <div>Country :</div>
+              </b-col>
+              <b-col cols="6">
+                <div> <span>{{ address.customer }}&nbsp;</span></div>
+                <div> <span>{{ address.email }}&nbsp;</span></div>
+                <div> <span>{{ address.line1 }}&nbsp;</span></div>
+                <div> <span>{{ address.line2 }}&nbsp;</span></div>
+                <div> <span>{{ address.state }}&nbsp;</span></div>
+                <div> <span>{{ address.zipcode }}&nbsp;</span></div>
+                <div> <span>{{ address.country }}&nbsp;</span></div>
+              </b-col>
+
+            </b-row>
+          </div>
+          <div v-if="payment">
+            <hr>
+            <h3>Payment</h3>
+            <b-row class="flex">
+              <b-col cols="6">
+                <div>Status: </div>
+                <div>Captured:</div>
+                <div>Amount: </div>
+              </b-col>
+              <b-col cols="6">
+                <div><span>{{ payment.status }}</span>&nbsp;</div>
+                <div><span>{{ payment.captured }}</span>&nbsp;</div>
+                <div><span>{{ payment.amount / 100 }} {{ payment.currency }}</span>&nbsp;</div>
+              </b-col>
+
+            </b-row>
+          </div>
+
+        </b-card-body>
+      </b-card>
+    </b-col>
+  </b-row>
 </template>
 
 <script>

@@ -9,7 +9,7 @@ let server = null;
 const app = require('../app')({
   env : 'development',
   url,
-  mongodbURI : process.env.ECHOPPE_TEST_MONGODBURI,
+  mongodbURI : `mongodb://localhost:27017/echoppetest`,
   testConfig : {
   },
   sessionUseStore : false,
